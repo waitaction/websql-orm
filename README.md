@@ -1,6 +1,6 @@
 # TypeScript orm框架(sqlite) 
 适用于chrome内核浏览器
-引入Entity，如果是es6项目，请手动在Entity.ts 文件 export {Entity,ColumnInfo}
+引入Entity
 修改 tsconfig.json
 ``` json
 {
