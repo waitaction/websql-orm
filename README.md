@@ -24,20 +24,20 @@ class user {
     entity.init(user);
 ```
 ### 插入记录
-```
-	//插入数据
+``` typescript
+    //插入数据
     var u = new user();
     u.id = "dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7";
     u.user_name = "小明";
-	//往user数据表插入一条数据
+    //往user数据表插入一条数据
     let result = await entity.insertData(u);
 ```
 ### 查询记录
-```
+``` typescript
      //查询记录
     let result = await entity.where({id:"dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7"}).getData(); 
 ```
 ### 修改记录
-```
-	 let result = await entity.where({ id: ""dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7"" }).updateData(u);
+``` typescript
+    let result = await entity.where({ id: ""dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7"" }).updateData(u);
 ```
