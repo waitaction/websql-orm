@@ -51,6 +51,6 @@ let result = await entity.where({id:"dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7"}).get
 ```
 ### 修改记录
 ``` typescript
-let result = await entity.where({ id: ""dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7"" }).updateData(u);
+let result = await entity.where({ id: "dac9e8fb-5a5e-47e0-ae36-2b77fe6a6df7" }).updateData(u);
 ```
 相关TypeScript知识，请参考TypeScript文档:https://www.tslang.cn/
