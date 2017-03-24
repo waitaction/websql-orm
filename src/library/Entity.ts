@@ -9,21 +9,25 @@ class Entity {
         this.dbName = dbname;
         this.db = window.openDatabase(dbname, '1.0.0', '', 65536 * 100);
     }
-    /**获取数据库名
-     * @returns string
+    /**初始化一个实体模型实例
+     * @param  {{new(} entityModel
      */
+    init<T>(entityModel: { new (): T }): Entity {
+        console.log(entityModel["___table"]);
+        console.log(entityModel["___columns"]);
+        this._table = entityModel["___table"];
+        this.__switchTable(this._table);
+        return this.__init(entityModel["___table"], entityModel["___columns"]);
+    }
+    /**获取数据库名
+        * @returns string
+        */
     getDBName(): string {
         return this.dbName;
     }
-    Initial<T>(): Entity {
-        console.log("Initial");
-        
-        return this;
-    }
-
-    init(tableName: string, colums: Array<Colum>): Entity {
+    __init(tableName: string, colums: Array<ColumnInfo>): Entity {
         try {
-            this.switchTable(tableName);
+            this.__switchTable(tableName);
         } catch (error) {
 
         }
@@ -31,7 +35,7 @@ class Entity {
         return this;
     }
 
-    createTable(colums: Array<Colum> | any) {
+    createTable(colums: Array<ColumnInfo> | any) {
         var sql = "CREATE TABLE IF NOT EXISTS " + this._table;
         var t;
         if (colums instanceof Array && colums.length > 0) {
@@ -49,12 +53,12 @@ class Entity {
         });
     }
 
-    switchTable(tableName: string) {
+    __switchTable(tableName: string) {
         console.log("switchTable:" + tableName);
         this._table = tableName;
         return this;
     }
-    insertData(data: any | Array<any>): Promise<boolean> {
+    insertDatas<T>(data: Array<T>): Promise<boolean> {
         var that = this;
         var promise = new Promise<boolean>(resolve => {
             var sql = "INSERT INTO " + this._table;
@@ -97,9 +101,13 @@ class Entity {
             queue();
         });
         return promise;
+
+    }
+    insertData<T>(data: T): Promise<boolean> {
+        return this.insertDatas([data]);
     }
 
-    where(where: any | string) {
+    where<T>(where: T | string) {
         if (typeof where === 'object') {
             var j = this.toArray(where);
             this._where = j.join(' and ');
@@ -111,7 +119,7 @@ class Entity {
         return this;
     }
 
-    updateData(data: any): Promise<any> {
+    async  updateData<T>(data: T | string): Promise<boolean> {
         var that = this;
         var sql = "Update " + this._table;
         console.log("updateData:");
@@ -119,7 +127,16 @@ class Entity {
         data = this.toArray(data).join(',');
 
         sql += " Set " + data + " where " + this._where;
-        return this.doQuery(sql);
+        var result: any = await this.doQuery(sql);
+        var promise = new Promise<boolean>(resolve => {
+            if (result[0] > 0) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+        return promise;
+
     }
 
     async  saveData(data: any): Promise<any> {
@@ -133,13 +150,13 @@ class Entity {
         }
     }
 
-    getData(callback): Promise<any> {
+    getData<T>(): Promise<Array<T>> {
         var that = this;
         var sql = "Select * from " + that._table;
         that._where.length > 0 ? sql += " where " + that._where : "";
         return that.doQuery(sql);
     }
-    doQuery(sql): Promise<any> {
+    doQuery<T>(sql: string): Promise<Array<T>> {
         var that = this;
         var promise = new Promise(resolve => {
             var a = [];
@@ -160,11 +177,19 @@ class Entity {
         return promise;
     }
     //根据条件删除数据
-    deleteData(): Promise<any> {
+    async  deleteData(): Promise<boolean> {
         var that = this;
         var sql = "delete from " + that._table;
         that._where.length > 0 ? sql += " where " + that._where : '';
-        return that.doQuery(sql);
+        var queryResult = await that.doQuery(sql);
+        var promise = new Promise<boolean>(resolve => {
+            if (queryResult != null && queryResult.length > 0) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+        return promise;
     }
     //删除表
     dropTable() {
@@ -176,7 +201,7 @@ class Entity {
         this._error = e.message;
         console.log('----sqlite:' + e.message);
     }
-    toArray(obj): Array<any> {
+    toArray<T>(obj): Array<T> {
         var t = [];
         obj = obj || {};
         if (obj) {
@@ -188,7 +213,40 @@ class Entity {
     }
 }
 
-class Colum {
+class ColumnInfo {
     name: string;
     type: string;
+}
+
+
+
+var router = Symbol();
+//装饰器会定义一些表与列的信息，用于存储定义列的信息
+var __columns = new Array<ColumnInfo>();
+var __table: string = "";
+/**列的装饰器，用于定义列类型
+ * @param  {string} type
+ */
+function Column(type: string) {
+    return function (target: any, name: string) {
+        let _column = new ColumnInfo();
+        _column.name = name;
+        _column.type = type;
+        let _target = target.constructor;
+        if (!_target.___columns) {
+            _target.___columns = new Array<ColumnInfo>();
+        }
+        _target.___columns.push(_column);
+    }
+}
+/**表的装饰器，用于定义该类属于表实体模型
+ */
+function Table() {
+    return function (target: any) {
+        __table = target.name;
+        if (!target.___columns) {
+            target.___columns = new Array<ColumnInfo>();
+        }
+        target.___table = target.name;
+    }
 }
