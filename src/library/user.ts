@@ -13,9 +13,16 @@ class user2 {
     public id2: string;
     @Column("number")
     public name2: string;
-
 }
 
+
+@Table()
+class test {
+    @Column("text")
+    public id2: string;
+    @Column("number")
+    public name2: string;
+}
 
 
 

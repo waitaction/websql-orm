@@ -1,30 +1,51 @@
-/// <reference path="./WebSQL.d.ts" />
-class WebSqlEntity {
+/**
+ * orm的相关规范
+ * 创建表、删除表、修改表
+ * 创建行、修改行、删除行、查询行
+ * 用例：
+ * 1.Entity.fromTable(表).where((m)=>{  m.id==""  }).toArray(); //查询数据
+ * 2.Entity.fromTable(表)
+ */
+export class Entity {
     private db: Database;
     private dbName: string;
+    private dbSize: number;
     private _table: string;
     private _where: string;
     private _error: string;
-    constructor(dbname: string) {
-        this.dbName = dbname;
-        this.db = window.openDatabase(dbname, '1.0.0', '', 65536 * 100);
+    constructor() {
+        this.dbName = window.localStorage.getItem("__websql_dbname__");
+        this.dbSize = parseInt(window.localStorage.getItem("__websql_maxsize__"));
+        this.db = window.openDatabase(this.dbName, '1.0.0', '', this.dbSize);
     }
-    /**初始化一个实体模型实例
-     * @param  {{new(} entityModel
+
+    /**
+     * 设置默认的sqlite数据库名，使用实体前调用，一般在程序初始时调用一次即可
+     * 
+     * @static
+     * @param {string} dbName 数据库名
+      * @param {string} dbName 数据库最大容量
+     * @returns {boolean} 设置成功返回true
      */
-    init<T>(entityModel: { new (): T }): WebSqlEntity {
+    public static config(defaultDbName: string, maxSize: number = 1024 * 1024 * 10): boolean {
+        try {
+            window.localStorage.setItem("__websql_dbname__", defaultDbName);
+            window.localStorage.setItem("__websql_maxsize__", maxSize.toString());
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    public static fromTable<T>(entityModel: { new(): T }): Entity {
+        let entity = new Entity();
         console.log(entityModel["___table"]);
         console.log(entityModel["___columns"]);
-        this._table = entityModel["___table"];
-        this.__switchTable(this._table);
-        return this.__init(entityModel["___table"], entityModel["___columns"]);
+        entity._table = entityModel["___table"];
+        entity.__switchTable(entity._table);
+        return entity.__init(entityModel["___table"], entityModel["___columns"]);
     }
-    /**获取数据库名
-        * @returns string
-        */
-    getDBName(): string {
-        return this.dbName;
-    }
+
     __init(tableName: string, colums: Array<ColumnInfo>): Entity {
         try {
             this.__switchTable(tableName);
@@ -34,7 +55,6 @@ class WebSqlEntity {
         colums.length > 0 ? this.createTable(colums) : '';
         return this;
     }
-
     createTable(colums: Array<ColumnInfo> | any) {
         var sql = "CREATE TABLE IF NOT EXISTS " + this._table;
         var t;
@@ -211,11 +231,6 @@ class WebSqlEntity {
         }
         return t;
     }
-}
-
-class ColumnInfo {
-    name: string;
-    type: string;
 }
 
 
