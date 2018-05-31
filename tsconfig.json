@@ -10,11 +10,13 @@
         ],
         "module": "es2015",
         "moduleResolution": "node",
-        "target": "es2015",
+        "target": "es5",
         "sourceMap": true
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "example/*.ts",
+        "example/**/*.ts"
     ],
     "exclude": [
         "node_modules"
