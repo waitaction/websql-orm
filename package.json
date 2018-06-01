@@ -20,6 +20,7 @@
     "linq": "^3.1.0"
   },
   "devDependencies": {
+    "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
     "style-loader": "^0.21.0",
