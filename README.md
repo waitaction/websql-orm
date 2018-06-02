@@ -38,11 +38,11 @@ class user extends BaseMetadata {
 | @table          | 用于定义表                    |  @table("student")                       |
 | @column         | 用于定义列                    |  @column(ColumnType.STRING)              |
 
-### 列字段类型枚举
+### 列字段类型枚举
 
-表字段枚举值与TypeScript基本类型保持一致，websql-orm框架会自动识别和转换
+表字段枚举值与TypeScript基本类型保持一致，websql-orm框架会自动识别和转换
 
-| 字段类型枚举名             | 描述                         | 
+| 字段类型枚举名             | 描述                         | 
 |-------------------------|-----------------------------|
 | ColumnType.PRIMARY      | 主键                         |
 | ColumnType.BOOLEAN      | 布尔值                       | 
