@@ -17,30 +17,30 @@ websql-orm 框架，用于chrome内核浏览器、nodejs、cordova 对sqlite数�
 如何使用实体类定义一个表?
 ``` typescript
 @table("student_db")
-class user extends BaseMetadata {
+export class user extends BaseMetadata {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
-    public id: string;
-    @column(ColumnType.STRING )
-    public user_name: string;
-    @column(ColumnType.STRING )
-    public password: string;
+    id: string;
+    @column(ColumnType.STRING)
+    user_name: string;
+    @column(ColumnType.STRING ) 
+    password: string;
 }
 ```
-> 1) 装饰器`@table` 定义类user为表实体，类别user是表名,@table("`student_db`") 参数 `student_db` 表示数据库名。  
+> 1) 装饰器`@table` 定义user表，关键字user是表名, `student_db` 是数据库名。  
 > 2) 装饰器 `@column` 定义列，`ColumnType` 枚举列字段类型  
-> 3) 每个表必须拥有一个主键字段，将添加`ColumnType.PRIMARY`则表示该字段为主键字段  
-> 4) 每个实体类必须继承`BaseMetadata`
+> 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
+> 4) 每个实体类必须继承 `BaseMetadata`
 
 ### 装饰器说明
 
-| 装饰器名         | 描述                         | 示例                                      |
-|-----------------|-----------------------------|------------------------------------------|
-| @table          | 用于定义表                    |  @table("student")                       |
-| @column         | 用于定义列                    |  @column(ColumnType.STRING)              |
+| 装饰器名         | 描述                      | 示例                                      |
+|-----------------|--------------------------|------------------------------------------|
+| @table          | 定义表                    |  @table("student")                       |
+| @column         | 定义列                    |  @column(ColumnType.STRING)              |
 
-### 列字段类型枚举
+### 字段类型枚举
 
-表字段枚举值与TypeScript基本类型保持一致，websql-orm框架会自动识别和转换
+表字段枚举值与TypeScript基本类型保持一致，websql-orm 会自动识别和转换
 
 | 字段类型枚举名             | 描述                         | 
 |-------------------------|-----------------------------|
@@ -58,10 +58,10 @@ class user extends BaseMetadata {
 ### 从数据表查询记录
 
 ``` typescript
-let list   = user.query(m=>m.name=="xiaoming");
-let result = user.queryFirst(m=>m.id=="test");
+let list   = user.query( m => m.name == "xiaoming" );
+let result = user.queryFirst( m => m.id == "test" );
 ```
-> `user` 是定义的表实体类。  
+> `user` 数据库表  
 > `query` 与 `queryFirst` 是静态方法
 
 ### 往数据表 添加/修改 记录
@@ -74,8 +74,8 @@ u.password  = "123456";
 u.save();
 ```
 
-当表数据是json时，则可以使用静态方法 `import` 导入记录，导入后会返回 `user` 的实例对像.  
-然后再调用 `save` 实例方法 添加/更新 数据.
+当数据是json时，则使用静态方法 `import` 导入记录，导入后会返回 `user` 的实例对像.  
+然后调用 `save` 实例方法 `添加/更新` 数据.
 
 ``` typescript
 user.import({
@@ -83,16 +83,15 @@ user.import({
     user_name :"小明",
     password  :"123456"
 }).save();
-
 ```
 
 ### 从数据表删除记录
-调用 `delete` 静态方法表删除记录
+调用 `delete` 静态方法删除记录
 ``` typescript
 let result:boolean = user.delete( m => m.id == "test" ); 
 ```
 
 ## 优化与建议
-websql-orm 目前仍处于开发阶段，有储多bug和不稳定。  
+websql-orm 目前处于开发阶段，有储多bug和不稳定。  
 如果有优化和改进的建议，可发邮件给我。  
-我的邮件是 350561378@qq.com
+我的邮件是 `350561378@qq.com`
