@@ -1,8 +1,8 @@
 # websql-orm
 
-websql-orm 框架，用于chrome内核浏览器、nodejs、cordova 对sqlite数据库的操作
+websql-orm 框架，支持 chrome、nodejs、cordova 的sqlite数据库读写。
 
-使用之前需在tsconfig.json添加装饰器配置项以启用装饰器特性
+websql-orm使用TypeScript语言编写，使用之前需在 `tsconfig.json` 添加装饰器配置项以启用装饰器特性.
 
 ``` json
 {
