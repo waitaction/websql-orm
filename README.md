@@ -13,7 +13,7 @@ websql-orm 框架，用于chrome内核浏览器、nodejs、cordova 对sqlite数�
 }
 ```
 
-## 定义表
+# 定义表
 如何使用实体类定义一个表?
 ``` typescript
 @table("student_db")
@@ -52,7 +52,7 @@ class user extends BaseMetadata {
 | ColumnType.DATE         | 日期                         | 
 | ColumnType.ANY          | 任意类型                      | 
 
-## 操作数据库数据 
+# 操作数据库数据 
 > *`以上述定义的 user 表为例`*
 
 ### 从数据表查询记录
