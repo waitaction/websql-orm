@@ -41,7 +41,7 @@ export class user extends BaseMetadata {
 
 表字段枚举值与TypeScript基本类型保持一致，websql-orm 会自动识别和转换
 
-| 字段类型枚举名             | 描述                         | 
+| 字段类型枚举              | 描述                         | 
 |-------------------------|-----------------------------|
 | ColumnType.PRIMARY      | 主键                         |
 | ColumnType.BOOLEAN      | 布尔值                       | 
