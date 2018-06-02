@@ -16,7 +16,7 @@
 如何使用实体类定义一个表?
 ``` typescript
 @table("student_db")
-export class user extends BaseMetadata {
+export class user extends BaseMetadata {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
     id: string;
     @column(ColumnType.STRING)
