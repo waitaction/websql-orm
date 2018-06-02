@@ -8,6 +8,7 @@ export abstract class BaseMetadata {
     private columnsDef: Array<ColumnInfo>;
     private primaryColDef: ColumnInfo;
     private tableName: string;
+
     constructor() {
         this.gSql = new GenerateSql();
         this.columnsDef = this.constructor["__columns__"];
@@ -35,7 +36,6 @@ export abstract class BaseMetadata {
      * 查询被修改的字段信息
      */
     queryChange(): any {
-        // 取变化的值
         let change = {};
         let diff = this["__diff__"];
         if (diff != null) {
@@ -43,7 +43,6 @@ export abstract class BaseMetadata {
                 if (diff.hasOwnProperty(key)) {
                     const element = diff[key];
                     if (this[key] != element) {
-                        // 变化的值
                         change[key] = this[key];
                     }
                 }
@@ -55,12 +54,48 @@ export abstract class BaseMetadata {
      * 是否存在记录
      */
     private async existRecord(): Promise<boolean> {
-        // 取主键字段名
         let diff = this["__diff__"];
         let _entity = new Entity(<any>this.constructor);
         let isExist = await _entity.existRecord(diff[this.primaryColDef.name]);
         return isExist;
     }
 
+    static async  query(predicate: (m: any) => void) {
+        let _entity = new Entity(<any>this.constructor);
+        let result = await _entity.queryAll()
+        if (result != null && result.length > 0) {
+            for (let index = 0; index < result.length; index++) {
+                const element = result[index];
+                let fResult = predicate(element);
+                if (fResult) {
+                    return _entity.convertToMetadata(<any>element);
+                }
+            }
+        }
+        return null;
+    }
+
+    static async queryFirst<T extends BaseMetadata>(predicate: (m: T) => void): Promise<T> {
+        let _entity = new Entity<T>(<any>this);
+        let result = await _entity.queryAll<T>()
+        if (result != null && result.length > 0) {
+            for (let index = 0; index < result.length; index++) {
+                const element = result[index];
+                let fResult = predicate(element);
+                if (fResult) {
+                    return _entity.convertToMetadata(element);
+                }
+            }
+        }
+        return null;
+    }
+
+    static delete() {
+
+    }
+
+    static import() {
+
+    }
 
 }

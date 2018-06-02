@@ -111,7 +111,7 @@ export class Entity<T extends BaseMetadata>{
         return promise;
     }
 
-    protected convertToMetadata(value: T): T {
+    convertToMetadata(value: T): T {
         let result: T = new this.objClass();
         result["__diff__"] = {};
         for (const key in value) {
