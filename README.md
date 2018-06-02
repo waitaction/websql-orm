@@ -14,7 +14,7 @@ websql-orm 框架，用于chrome内核浏览器、nodejs、cordova 对sqlite数�
 ```
 
 ## 定义表
-如何使用实体类定义一个表？
+如何使用实体类定义一个表?
 ``` typescript
 @table("student_db")
 class user extends BaseMetadata {
@@ -26,9 +26,9 @@ class user extends BaseMetadata {
     public password: string;
 }
 ```
-> 1) 装饰器 `@table` 定义类user为表实体，类别user是表名，@table("`student_db`") 参数 `student_db` 表示数据库名。  
-> 2) 装饰器 `@column` 定义列，`ColumnType` 枚举列字段类型  
-> 3) 每个表必须拥有一个主键字段，将添加`ColumnType.PRIMARY`则表示该字段为主键字段  
+> 1) 装饰器`@table` 定义类user为表实体，类别user是表名，@table("`student_db`") 参数 `student_db` 表示数据库名。  
+> 2) 装饰器 `@column` 定义列，`ColumnType` 枚举列字段类型  
+> 3) 每个表必须拥有一个主键字段，将添加`ColumnType.PRIMARY`则表示该字段为主键字段  
 > 4) 每个实体类必须继承`BaseMetadata`
 
 ### 装饰器说明
@@ -38,9 +38,9 @@ class user extends BaseMetadata {
 | @table          | 用于定义表                    |  @table("student")                       |
 | @column         | 用于定义列                    |  @column(ColumnType.STRING)              |
 
-### 列字段类型枚举
+### 列字段类型枚举
 
-列字段枚举值与TypeScript基本类型保持一致，websql-orm框架会自动识别和转换
+表字段枚举值与TypeScript基本类型保持一致，websql-orm框架会自动识别和转换
 
 | 字段类型枚举名             | 描述                         | 
 |-------------------------|-----------------------------|
@@ -73,11 +73,11 @@ u.password  = "123456";
 u.save();
 ```
 
-当表数据是json时，则可以使用静态方法 `import` 导入记录，导入后会返回 `user` 的实例对像.  
+当表数据是json时，则可以使用静态方法 `import` 导入记录，导入后会返回 `user` 的实例对像.  
 然后再调用 `save` 实例方法 添加/更新 数据.
 
 ``` typescript
-user.import({
+user.import({
     id        :"guid",
     user_name :"小明",
     password  :"123456"
@@ -88,10 +88,10 @@ u.save();
 ### 从数据表删除记录
 调用 `delete` 静态方法表删除记录
 ``` typescript
-let result:boolean = user.delete( m => m.id == "test" ); 
+let result:boolean = user.delete( m => m.id == "test" ); 
 ```
 
 ## 优化与建议
-websql-orm 目前仍处于开发阶段，有储多bug和不稳定。  
+websql-orm 目前仍处于开发阶段，有储多bug和不稳定。  
 如果有优化和改进的建议，可发邮件给我。  
 我的邮件是 350561378@qq.com
