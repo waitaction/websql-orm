@@ -26,8 +26,8 @@ class user extends BaseMetadata {
     public password: string;
 }
 ```
-> 1) 装饰器`@table` 定义类user为表实体，类别user是表名，@table("`student_db`") 参数 `student_db` 表示数据库名。  
-> 2) 装饰器 `@column` 定义列，`ColumnType` 枚举列字段类型  
+> 1) 装饰器`@table` 定义类user为表实体，类别user是表名,@table("`student_db`") 参数 `student_db` 表示数据库名。  
+> 2) 装饰器 `@column` 定义列，`ColumnType` 枚举列字段类型  
 > 3) 每个表必须拥有一个主键字段，将添加`ColumnType.PRIMARY`则表示该字段为主键字段  
 > 4) 每个实体类必须继承`BaseMetadata`
 
