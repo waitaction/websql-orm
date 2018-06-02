@@ -55,6 +55,20 @@ export class Entity<T extends BaseMetadata>{
         });
         return promise;
     }
+
+    delete<T>(predicate: (m: T) => void): Promise<Array<T>> {
+        let that = this;
+        let sql = `delete from ${this.tableName}`;
+        let promise = new Promise<Array<T>>(resolve => {
+            that.db.transaction((t) => {
+                t.executeSql(sql, [], (b, result) => {
+                    resolve(<any>result.rows);
+                }, that.fail);
+            });
+        });
+        return promise;
+    }
+
     /**
      * 是否存在记录
      */

@@ -60,42 +60,46 @@ export abstract class BaseMetadata {
         return isExist;
     }
 
-    static async  query(predicate: (m: any) => void) {
-        let _entity = new Entity(<any>this.constructor);
-        let result = await _entity.queryAll()
+    static async  query<T extends BaseMetadata>(predicate: (m: T) => void): Promise<Array<T>> {
+        let entity = new Entity(<any>this);
+        let result = await entity.queryAll<T>()
         if (result != null && result.length > 0) {
+            let list: Array<T> = [];
             for (let index = 0; index < result.length; index++) {
                 const element = result[index];
                 let fResult = predicate(element);
                 if (fResult) {
-                    return _entity.convertToMetadata(<any>element);
+                    list.push(<T>entity.convertToMetadata(element));
                 }
             }
+            return list;
         }
         return null;
     }
 
     static async queryFirst<T extends BaseMetadata>(predicate: (m: T) => void): Promise<T> {
-        let _entity = new Entity<T>(<any>this);
-        let result = await _entity.queryAll<T>()
+        let entity = new Entity<T>(<any>this);
+        let result = await entity.queryAll<T>()
         if (result != null && result.length > 0) {
             for (let index = 0; index < result.length; index++) {
                 const element = result[index];
                 let fResult = predicate(element);
                 if (fResult) {
-                    return _entity.convertToMetadata(element);
+                    return entity.convertToMetadata(element);
                 }
             }
         }
         return null;
     }
 
-    static delete() {
-
+    static async delete<T extends BaseMetadata>(predicate: (m: T) => void): Promise<boolean> {
+       // this.queryFirst(predicate);
+        return false;
     }
 
-    static import() {
-
+    static import<T extends BaseMetadata>(value: any): T {
+        let entity = new Entity<T>(<any>this);
+        return entity.convertToMetadata(value);
     }
 
 }

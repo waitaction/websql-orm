@@ -91,5 +91,13 @@ export class GenerateSql {
         param.push(primaryKeyValue);
         let tuple: [string, Array<any>] = [sql, param];
         return tuple;
+   
+    }
+
+    gWhereSql(predicate: (m: any) => void): [string, Array<any>] {
+        let pStr = predicate.toString();
+        // this.gWhereSql(m => m.id == str) //把变量 str 的值取出来就可以转换成sql了
+        // 正则取条件
+        return null;
     }
 }

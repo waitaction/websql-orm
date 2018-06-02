@@ -21,7 +21,8 @@ export class demo {
 
     }
     async query() {
-        let result1 = await user.queryFirst((m: user) => m.id == "iiiiiddddd");
+        let str="iiiiiddddd";
+        let result1 = await user.queryFirst((m: user) => m.id == str);
         // let result1 = await entity(user).queryFirst(m => m.id == "iiiiiddddd");
         console.log("查询表user第一条数据:");
         console.log(result1);
