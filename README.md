@@ -52,7 +52,8 @@ class user extends BaseMetadata {
 | ColumnType.DATE         | 日期                         | 
 | ColumnType.ANY          | 任意类型                      | 
 
-## 操作数据库数据
+## 操作数据库数据 
+> *`以上述定义的 user 表为例`*
 
 ### 从数据表查询记录
 
