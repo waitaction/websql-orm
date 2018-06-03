@@ -49,7 +49,7 @@ export abstract class BaseMetadata {
         return change;
     }
 
-    async existRecord(): Promise<boolean> {
+    private async existRecord(): Promise<boolean> {
         let diff = this["__diff__"];
         let _entity = new Entity(<any>this.constructor);
         let isExist = await _entity.existRecord(diff[this.primaryColDef.name]);

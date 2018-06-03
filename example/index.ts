@@ -10,6 +10,7 @@ export class demo {
     }
     async insert() {
         let _user = new user();
+    
         _user.id = "iiiiiddddd";
         _user.name = "xixixixixixi";
         let insertResult = await entity(user).insert(_user);
