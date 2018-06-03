@@ -14,19 +14,19 @@ export class Entity<T extends BaseMetadata>{
     constructor(
         public objClass: { new(): T }) {
         this.gSql = new GenerateSql();
-        this.init().then();
-    }
-
-    async init() {
         this.tableName = this.objClass["__table_name__"];
         this.dbName = this.objClass["__db_name__"];
         this.columnsDef = this.objClass["__columns__"];
         this.db = DatabaseManage.getDataBase(this.dbName, 65536 * 10);
+    }
+
+    async init() {
         await this.createTable(this.columnsDef);
     }
 
     async queryFirst(predicate: (m: T) => void): Promise<T> {
         let that = this;
+        await this.init();
         let result: Array<any> = await this.queryAll();
         if (result != null && result.length > 0) {
             for (let index = 0; index < result.length; index++) {
@@ -40,11 +40,9 @@ export class Entity<T extends BaseMetadata>{
         return null;
     }
 
-    /**
-     * 查询表所有数据
-     */
-    queryAll<T>(): Promise<Array<T>> {
+    async queryAll<T>(): Promise<Array<T>> {
         let that = this;
+        await this.init();
         let sql = `select * from ${this.tableName}`;
         let promise = new Promise<Array<T>>(resolve => {
             that.db.transaction((t) => {
@@ -56,25 +54,32 @@ export class Entity<T extends BaseMetadata>{
         return promise;
     }
 
-    delete<T>(predicate: (m: T) => void): Promise<Array<T>> {
+    async delete(predicate: (m: T) => void): Promise<boolean> {
         let that = this;
-        let sql = `delete from ${this.tableName}`;
-        let promise = new Promise<Array<T>>(resolve => {
+        await this.init();
+        let result = await this.queryFirst(predicate);
+        // 取主键
+        let primaryKeyName: string;
+        for (let index = 0; index < this.columnsDef.length; index++) {
+            const element = this.columnsDef[index];
+            if ((element.type & ColumnType.PRIMARY) == ColumnType.PRIMARY) {
+                primaryKeyName = element.name;
+            }
+        }
+        let sql = `delete from ${this.tableName} where ${primaryKeyName} = ? ;`;
+        let promise = new Promise<boolean>(resolve => {
             that.db.transaction((t) => {
-                t.executeSql(sql, [], (b, result) => {
-                    resolve(<any>result.rows);
+                t.executeSql(sql, [result[primaryKeyName]], (b, result) => {
+                    resolve(result.rowsAffected > 0);
                 }, that.fail);
             });
         });
         return promise;
     }
 
-    /**
-     * 是否存在记录
-     */
-    existRecord(primaryValue: string): Promise<boolean> {
-        // 主键字段
+    async existRecord(primaryValue: string): Promise<boolean> {
         let that = this;
+        await this.init();
         let primaryCol = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
         let sql = `select * from ${this.tableName} where ${primaryCol.name} = ? ;`;
         let promise = new Promise<boolean>(resolve => {
@@ -86,10 +91,8 @@ export class Entity<T extends BaseMetadata>{
         });
         return promise;
     }
-    /**
-     * 创建表
-     */
-    createTable(columns: Array<ColumnInfo>): Promise<boolean> {
+
+    async createTable(columns: Array<ColumnInfo>): Promise<boolean> {
         let that = this;
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
@@ -104,13 +107,12 @@ export class Entity<T extends BaseMetadata>{
         });
         return promise;
     }
-    /**
-     * 插入记录
-     */
+
     async insert(value): Promise<boolean> {
         console.log(value);
         let sqlResult = this.gSql.gInsertSql(this.tableName, this.objClass["__columns__"], value);
         let that = this;
+        await this.init();
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
@@ -137,12 +139,10 @@ export class Entity<T extends BaseMetadata>{
         }
         return result;
     }
-    /**
-     * 执行sql语句
-     * @returns {Promise<number>} 返回受影响行数
-     */
-    execSql(sql: string, value: Array<any>): Promise<number> {
+
+    async execSql(sql: string, value: Array<any>): Promise<number> {
         let that = this;
+        await this.init();
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, value, (b, result) => {
@@ -152,7 +152,6 @@ export class Entity<T extends BaseMetadata>{
         });
         return promise;
     }
-
     fail(transaction: SQLTransaction, error: SQLError): boolean {
         console.error(error.message);
         return true;

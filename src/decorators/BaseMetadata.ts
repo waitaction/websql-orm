@@ -8,7 +8,6 @@ export abstract class BaseMetadata {
     private columnsDef: Array<ColumnInfo>;
     private primaryColDef: ColumnInfo;
     private tableName: string;
-
     constructor() {
         this.gSql = new GenerateSql();
         this.columnsDef = this.constructor["__columns__"];
@@ -17,7 +16,6 @@ export abstract class BaseMetadata {
     }
 
     async save(): Promise<boolean> {
-        // 取变化的值
         let change = this.queryChange();
         let diff = this["__diff__"];
         let isExist = await this.existRecord();
@@ -35,7 +33,7 @@ export abstract class BaseMetadata {
     /**
      * 查询被修改的字段信息
      */
-    queryChange(): any {
+    private queryChange(): any {
         let change = {};
         let diff = this["__diff__"];
         if (diff != null) {
@@ -50,10 +48,8 @@ export abstract class BaseMetadata {
         }
         return change;
     }
-    /**
-     * 是否存在记录
-     */
-    private async existRecord(): Promise<boolean> {
+
+    async existRecord(): Promise<boolean> {
         let diff = this["__diff__"];
         let _entity = new Entity(<any>this.constructor);
         let isExist = await _entity.existRecord(diff[this.primaryColDef.name]);
@@ -93,8 +89,10 @@ export abstract class BaseMetadata {
     }
 
     static async delete<T extends BaseMetadata>(predicate: (m: T) => void): Promise<boolean> {
-       // this.queryFirst(predicate);
-        return false;
+        let result = await this.queryFirst(predicate);
+        let entity = new Entity<T>(<any>this);
+        let delResult = await entity.delete(predicate);
+        return delResult;
     }
 
     static import<T extends BaseMetadata>(value: any): T {
