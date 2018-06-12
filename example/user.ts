@@ -9,4 +9,5 @@ export class user extends BaseMetadata {
     id: string;
     @column(ColumnType.STRING)
     name: string;
+
 }

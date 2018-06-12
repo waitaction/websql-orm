@@ -1,8 +1,8 @@
-import { BaseMetadata } from './decorators/BaseMetadata';
-import { column } from './decorators/column';
-import { DatabaseManage } from './decorators/DatabaseManage';
-import { entity } from './decorators/entity';
-import { GenerateSql } from './decorators/gsql';
-import { table } from './decorators/table';
-import { ColumnInfo } from './model/ColumnInfo';
-import { ColumnType } from './model/ColumnType';
+export { BaseMetadata } from './decorators/BaseMetadata';
+export { column } from './decorators/column';
+export { DatabaseManage } from './decorators/DatabaseManage';
+export { entity } from './decorators/entity';
+export { GenerateSql } from './decorators/gsql';
+export { table } from './decorators/table';
+export { ColumnInfo } from './model/ColumnInfo';
+export { ColumnType } from './model/ColumnType';
