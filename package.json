@@ -4,7 +4,7 @@
   "description": "websql ORM for browser and cordova.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
   "keywords": [
@@ -17,9 +17,7 @@
   ],
   "author": "waitaction",
   "license": "ISC",
-  "dependencies": {
-    "linq": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
@@ -29,6 +27,7 @@
     "typescript": "^2.8.4",
     "webpack": "^4.10.2",
     "webpack-cli": "^3.0.4",
+    "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.2"
   }
 }

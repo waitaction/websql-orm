@@ -1,11 +1,11 @@
-import { BaseMetadata } from "./BaseMetadata";
+import { DbMeta } from "./DbMeta";
 import { ColumnInfo } from "../model/ColumnInfo";
 import { ColumnType } from "../model/ColumnType";
-import { GenerateSql } from "./gsql";
-import { DatabaseManage } from "./DatabaseManage";
+import { GenerateSql } from "./GenerateSql";
+import { DbManage } from "./DbManage";
 /// <reference types="websql" />
 
-export class Entity<T extends BaseMetadata>{
+export class Entity<T extends DbMeta>{
     private db: Database;
     private tableName: string; //表名
     private dbName: string;//数据库名
@@ -17,14 +17,14 @@ export class Entity<T extends BaseMetadata>{
         this.tableName = this.objClass["__table_name__"];
         this.dbName = this.objClass["__db_name__"];
         this.columnsDef = this.objClass["__columns__"];
-        this.db = DatabaseManage.getDataBase(this.dbName, 65536 * 10);
+        this.db = DbManage.getDataBase(this.dbName, 65536 * 10);
     }
 
     async init() {
         await this.createTable(this.columnsDef);
     }
 
-    async queryFirst(predicate: (m: T) => void): Promise<T> {
+    async queryFirst(predicate: (m: T) => any): Promise<T> {
         let that = this;
         await this.init();
         let result: Array<any> = await this.queryAll();
@@ -158,7 +158,7 @@ export class Entity<T extends BaseMetadata>{
     }
 
 }
-export function entity<T extends BaseMetadata>(objClass: { new(): T }) {
+export function entity<T extends DbMeta>(objClass: { new(): T }) {
     let _entity = new Entity<T>(objClass);
     return _entity;
 }

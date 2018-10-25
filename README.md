@@ -12,6 +12,8 @@
 }
 ```
 
+拷贝 `src/orm` 文件夹到你的typescript项目目录
+
 # 定义表
 如何使用实体类定义一个表?
 ``` typescript
@@ -28,7 +30,7 @@ export class user extends BaseMetadata {
 > 1) 装饰器`@table` 定义user表，关键字user是表名, `student_db` 是数据库名。  
 > 2) 装饰器 `@column` 定义列，`ColumnType.STRING` 表示该字段是文本类型  
 > 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
-> 4) 每个实体类必须继承 `BaseMetadata`
+> 4) 每个实体类必须继承 `DbMeta`
 
 ### 装饰器说明
 

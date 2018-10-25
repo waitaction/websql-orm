@@ -1,5 +1,6 @@
 import { ColumnType } from "./ColumnType";
-export class ColumnInfo {
+/**列信息 */
+export declare class ColumnInfo {
     name: string;
     type: ColumnType;
 }

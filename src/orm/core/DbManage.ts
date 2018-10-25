@@ -1,4 +1,4 @@
-export class DatabaseManage {
+export class DbManage {
     private static db: any;
     public static getDataBase(dbName: string, dbMaxSize: number): Database {
         if (this.db == null) {
@@ -9,5 +9,4 @@ export class DatabaseManage {
         }
         return this.db[dbName];
     }
-
 }

@@ -1,9 +1,11 @@
-import { Entity } from "./entity";
+import { Entity } from "./Entity";
+import { GenerateSql } from "./GenerateSql";
 import { ColumnInfo } from "../model/ColumnInfo";
-import { GenerateSql } from "./gsql";
 import { ColumnType } from "../model/ColumnType";
 
-export abstract class BaseMetadata {
+
+
+export abstract class DbMeta {
     private gSql: GenerateSql;
     private columnsDef: Array<ColumnInfo>;
     private primaryColDef: ColumnInfo;
@@ -50,13 +52,13 @@ export abstract class BaseMetadata {
     }
 
     private async existRecord(): Promise<boolean> {
-        let diff = this["__diff__"];
+        //let diff = this["__diff__"];
         let _entity = new Entity(<any>this.constructor);
-        let isExist = await _entity.existRecord(diff[this.primaryColDef.name]);
+        let isExist = await _entity.existRecord(this[this.primaryColDef.name]);
         return isExist;
     }
 
-    static async  query<T extends BaseMetadata>(predicate: (m: T) => void): Promise<Array<T>> {
+    static async  query<T extends DbMeta>(predicate: (m: T) => any): Promise<Array<T>> {
         let entity = new Entity(<any>this);
         let result = await entity.queryAll<T>()
         if (result != null && result.length > 0) {
@@ -73,7 +75,7 @@ export abstract class BaseMetadata {
         return null;
     }
 
-    static async queryFirst<T extends BaseMetadata>(predicate: (m: T) => void): Promise<T> {
+    static async queryFirst<T extends DbMeta>(predicate: (m: T) => any): Promise<T> {
         let entity = new Entity<T>(<any>this);
         let result = await entity.queryAll<T>()
         if (result != null && result.length > 0) {
@@ -88,14 +90,14 @@ export abstract class BaseMetadata {
         return null;
     }
 
-    static async delete<T extends BaseMetadata>(predicate: (m: T) => void): Promise<boolean> {
+    static async delete<T extends DbMeta>(predicate: (m: T) => void): Promise<boolean> {
         let result = await this.queryFirst(predicate);
         let entity = new Entity<T>(<any>this);
         let delResult = await entity.delete(predicate);
         return delResult;
     }
 
-    static import<T extends BaseMetadata>(value: any): T {
+    static import<T extends DbMeta>(value: any): T {
         let entity = new Entity<T>(<any>this);
         return entity.convertToMetadata(value);
     }

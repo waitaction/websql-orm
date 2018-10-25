@@ -1,4 +1,5 @@
-export enum ColumnType {
+/**列类型 */
+export declare enum ColumnType {
     BOOLEAN = 2,
     NUMBER = 4,
     STRING = 8,
