@@ -20,10 +20,12 @@ export class Entity<T extends DbMeta>{
         this.db = DbManage.getDataBase(this.dbName, 65536 * 10);
     }
 
+    /**初始 */
     async init() {
         await this.createTable(this.columnsDef);
     }
 
+    /**查询记录，只返回第一条 */
     async queryFirst(predicate: (m: T) => any): Promise<T> {
         let that = this;
         await this.init();
@@ -40,6 +42,7 @@ export class Entity<T extends DbMeta>{
         return null;
     }
 
+    /**查询表的所有记录 */
     async queryAll<T>(): Promise<Array<T>> {
         let that = this;
         await this.init();
@@ -54,6 +57,7 @@ export class Entity<T extends DbMeta>{
         return promise;
     }
 
+    /**删除指定条件的记录 */
     async delete(predicate: (m: T) => void): Promise<boolean> {
         let that = this;
         await this.init();
@@ -76,8 +80,10 @@ export class Entity<T extends DbMeta>{
         });
         return promise;
     }
-
-    async existRecord(primaryValue: string): Promise<boolean> {
+    /**
+     * 数据库表是否存在记录，primaryValue是记录主键值
+     */
+    async exist(primaryValue: string): Promise<boolean> {
         let that = this;
         await this.init();
         let primaryCol = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
@@ -91,7 +97,7 @@ export class Entity<T extends DbMeta>{
         });
         return promise;
     }
-
+    /**创建表 */
     async createTable(columns: Array<ColumnInfo>): Promise<boolean> {
         let that = this;
         let promise = new Promise<boolean>(resolve => {
@@ -107,7 +113,7 @@ export class Entity<T extends DbMeta>{
         });
         return promise;
     }
-
+    /**插入记录 */
     async insert(value): Promise<boolean> {
         console.log(value);
         let sqlResult = this.gSql.gInsertSql(this.tableName, this.objClass["__columns__"], value);
@@ -126,7 +132,7 @@ export class Entity<T extends DbMeta>{
         });
         return promise;
     }
-
+    /**转化到实体元数据 */
     convertToMetadata(value: T): T {
         let result: T = new this.objClass();
         result["__diff__"] = {};
@@ -139,7 +145,7 @@ export class Entity<T extends DbMeta>{
         }
         return result;
     }
-
+    /**执行sql语句 */
     async execSql(sql: string, value: Array<any>): Promise<number> {
         let that = this;
         await this.init();

@@ -10,8 +10,8 @@ export declare abstract class DbMeta {
      */
     private queryChange;
     private existRecord;
-    static query<T extends DbMeta>(predicate: (m: T) => void): Promise<Array<T>>;
-    static queryFirst<T extends DbMeta>(predicate: (m: T) => void): Promise<T>;
+    static query<T extends DbMeta>(predicate: (m: T) => any): Promise<Array<T>>;
+    static queryFirst<T extends DbMeta>(predicate: (m: T) => any): Promise<T>;
     static delete<T extends DbMeta>(predicate: (m: T) => void): Promise<boolean>;
     static import<T extends DbMeta>(value: any): T;
 }

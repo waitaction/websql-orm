@@ -3,8 +3,7 @@ import { GenerateSql } from "./GenerateSql";
 import { ColumnInfo } from "../model/ColumnInfo";
 import { ColumnType } from "../model/ColumnType";
 
-
-
+/**由实体类继承该类，DbMeta类用于操作sqlite数据 */
 export abstract class DbMeta {
     private gSql: GenerateSql;
     private columnsDef: Array<ColumnInfo>;
@@ -16,14 +15,20 @@ export abstract class DbMeta {
         this.primaryColDef = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
         this.tableName = this.constructor["__table_name__"]
     }
-
+    /*
+    *保存数据到数据库 
+    */
     async save(): Promise<boolean> {
         let change = this.queryChange();
+
         let diff = this["__diff__"];
-        let isExist = await this.existRecord();
+        let isExist = await this.exist();
+        if (isExist && change == null) {
+            throw "创建记录失败，若修改记录，需要执行查询操作，在查询的结果修改，再调用save()方法保存";
+        }
         let sql: [string, any[]];
-        if (isExist) {
-            sql = this.gSql.gUpdateSql(this.tableName, this.primaryColDef.name, diff[this.primaryColDef.name], change);
+        if (isExist && change != null) {
+            sql = this.gSql.gUpdateSql(this.tableName, this.primaryColDef.name, this[this.primaryColDef.name], change);
         } else {
             sql = this.gSql.gInsertSql(this.tableName, this.columnsDef, this);
         }
@@ -47,17 +52,21 @@ export abstract class DbMeta {
                     }
                 }
             }
+            return change;
+        } else {
+            return null
         }
-        return change;
     }
-
-    private async existRecord(): Promise<boolean> {
-        //let diff = this["__diff__"];
+    /**
+     * 数据库表是否已有记录，以主键ID为识别依据
+     */
+    private async exist(): Promise<boolean> {
         let _entity = new Entity(<any>this.constructor);
-        let isExist = await _entity.existRecord(this[this.primaryColDef.name]);
+        let isExist = await _entity.exist(this[this.primaryColDef.name]);
         return isExist;
     }
 
+    /**查询记录 */
     static async  query<T extends DbMeta>(predicate: (m: T) => any): Promise<Array<T>> {
         let entity = new Entity(<any>this);
         let result = await entity.queryAll<T>()
@@ -74,7 +83,7 @@ export abstract class DbMeta {
         }
         return null;
     }
-
+    /**查询记录，仅返回一条 */
     static async queryFirst<T extends DbMeta>(predicate: (m: T) => any): Promise<T> {
         let entity = new Entity<T>(<any>this);
         let result = await entity.queryAll<T>()
@@ -89,7 +98,7 @@ export abstract class DbMeta {
         }
         return null;
     }
-
+    /**删除记录 */
     static async delete<T extends DbMeta>(predicate: (m: T) => void): Promise<boolean> {
         let result = await this.queryFirst(predicate);
         let entity = new Entity<T>(<any>this);
@@ -97,6 +106,7 @@ export abstract class DbMeta {
         return delResult;
     }
 
+    /**导入记录以进行操作,一般用于导入ajax返回的数据 */
     static import<T extends DbMeta>(value: any): T {
         let entity = new Entity<T>(<any>this);
         return entity.convertToMetadata(value);
