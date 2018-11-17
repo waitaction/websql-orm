@@ -94,5 +94,3 @@ let result:boolean = user.delete( m => m.id == "test" );
 
 ## 优化与建议
 websql-orm 目前处于开发阶段，有储多bug和不稳定。  
-如果有优化和改进的建议，可发邮件给我。  
-我的邮件是 `350561378@qq.com`
