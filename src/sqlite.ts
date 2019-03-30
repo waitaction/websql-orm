@@ -63,8 +63,8 @@ export class GenerateSql {
     /**
      * 生成创建表sql语句
      */
-    gCreateTableSql(tableName: string, columnDef: Array<ColumnInfo>): string {
-        let sql = "CREATE TABLE IF NOT EXISTS " + tableName;
+    gCreateTableSql(__tableName: string, columnDef: Array<ColumnInfo>): string {
+        let sql = "CREATE TABLE IF NOT EXISTS " + __tableName;
         let colSql = [];
         if (columnDef instanceof Array && columnDef.length > 0) {
             for (let index = 0; index < columnDef.length; index++) {
@@ -100,15 +100,15 @@ export class GenerateSql {
     /**
      * 生成插入记录sql语句
      */
-    gInsertSql(tableName: string, columnsDef: any, value: any): [string, Array<any>] {
+    gInsertSql(__tableName: string, __columnsDef: any, value: any): [string, Array<any>] {
         let that = this;
-        let sql: string = `insert into ${tableName} `;
+        let sql: string = `insert into ${__tableName} `;
         let cols = [];
         let qs = [];
-        if (columnsDef instanceof Array && columnsDef.length > 0) {
+        if (__columnsDef instanceof Array && __columnsDef.length > 0) {
             let param: Array<any> = [];
-            for (let index = 0; index < columnsDef.length; index++) {
-                const col = columnsDef[index];
+            for (let index = 0; index < __columnsDef.length; index++) {
+                const col = __columnsDef[index];
                 cols.push(col.name);
                 qs.push('?');
                 param.push(value[col.name]);
@@ -124,9 +124,9 @@ export class GenerateSql {
     /**
     * 生成更新记录sql语句
     */
-    gUpdateSql(tableName: string, primaryKeyName: string, primaryKeyValue: string, diffValue: any): [string, Array<any>] {
+    gUpdateSql(__tableName: string, primaryKeyName: string, primaryKeyValue: string, diffValue: any): [string, Array<any>] {
         let that = this;
-        let sql: string = `update ${tableName} set `;
+        let sql: string = `update ${__tableName} set `;
         let cols = [];
         let param: Array<any> = [];
         if (diffValue != null) {
@@ -153,33 +153,33 @@ export class GenerateSql {
  * */
 export abstract class Table {
     /**列定义的信息 */
-    private columnsDef: Array<ColumnInfo>;
+    private __columnsDef: Array<ColumnInfo>;
     /**主键列 */
-    private primaryColDef: ColumnInfo;
+    private __primaryColDef: ColumnInfo;
     /**表名 */
-    private tableName: string;
+    private __tableName: string;
     constructor() {
-        this.columnsDef = this.constructor["__columns__"];
-        this.primaryColDef = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        this.tableName = this.constructor["__table_name__"]
-        if (this.primaryColDef == null) {
-            throw `${this.tableName} 实体未定义主键，每个实体必须定义一个主键，且只有一个，例如：@column(ColumnType.STRING | ColumnType.PRIMARY)`;
+        this.__columnsDef = this.constructor["__columns__"];
+        this.__primaryColDef = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        this.__tableName = this.constructor["__table_name__"]
+        if (this.__primaryColDef == null) {
+            throw `${this.__tableName} 实体未定义主键，每个实体必须定义一个主键，且只有一个，例如：@column(ColumnType.STRING | ColumnType.PRIMARY)`;
         }
     }
 
 }
 export class DbContext<T extends Table>{
     private db: Database;
-    private tableName: string; // 表名
+    private __tableName: string; // 表名
     private dbName: string;// 数据库名
-    private columnsDef: Array<ColumnInfo>;
+    private __columnsDef: Array<ColumnInfo>;
     private gSql: GenerateSql;
     constructor(
         public objClass: { new(): T }) {
         this.gSql = new GenerateSql();
-        this.tableName = this.objClass["__table_name__"];
+        this.__tableName = this.objClass["__table_name__"];
         this.dbName = this.objClass["__db_name__"];
-        this.columnsDef = this.objClass["__columns__"];
+        this.__columnsDef = this.objClass["__columns__"];
         this.db = window.openDatabase(this.dbName, '1.0.0', '', 65536 * 10);
     }
 
@@ -194,7 +194,14 @@ export class DbContext<T extends Table>{
         let promise = new Promise<Array<T>>(resolve => {
             that.db.transaction((t) => {
                 t.executeSql(sql, value, (b, result) => {
-                    resolve(<any>result.rows);
+                    var datas: Array<T> = [];
+                    if (result.rows != null && result.rows.length > 0) {
+                        for (let index = 0; index < result.rows.length; index++) {
+                            const element = result.rows[index];
+                            datas.push(that.convertToMetadata(element));
+                        }
+                    }
+                    resolve(datas);
                 }, that.fail);
             });
         });
@@ -207,8 +214,8 @@ export class DbContext<T extends Table>{
     async exist(primaryValue: string): Promise<boolean> {
         let that = this;
         await this.init();
-        let primaryCol = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        let sql = `select * from ${this.tableName} where ${primaryCol.name} = ? ;`;
+        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        let sql = `select * from ${this.__tableName} where ${primaryCol.name} = ? ;`;
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, [primaryValue], (b, result) => {
@@ -223,7 +230,7 @@ export class DbContext<T extends Table>{
      * 插入记录 
      * */
     async insert(value: T): Promise<boolean> {
-        let sqlResult = this.gSql.gInsertSql(this.tableName, this.objClass["__columns__"], value);
+        let sqlResult = this.gSql.gInsertSql(this.__tableName, this.objClass["__columns__"], value);
         let that = this;
         await this.init();
         let promise = new Promise<boolean>(resolve => {
@@ -243,8 +250,8 @@ export class DbContext<T extends Table>{
      * 修改记录 
      * */
     async update(value: T): Promise<boolean> {
-        let primaryCol = this.columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        let sqlResult = this.gSql.gUpdateSql(this.tableName, primaryCol.name, value[primaryCol.name], value);
+        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        let sqlResult = this.gSql.gUpdateSql(this.__tableName, primaryCol.name, value[primaryCol.name], value);
         let that = this;
         await this.init();
         let promise = new Promise<boolean>(resolve => {
@@ -285,7 +292,7 @@ export class DbContext<T extends Table>{
      * 初始 
      * */
     private async init() {
-        await this.createTable(this.columnsDef);
+        await this.createTable(this.__columnsDef);
     }
 
     /**
@@ -295,7 +302,7 @@ export class DbContext<T extends Table>{
         let that = this;
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
-                t.executeSql(that.gSql.gCreateTableSql(that.tableName, columns), [], (t: SQLTransaction, result: SQLResultSet) => {
+                t.executeSql(that.gSql.gCreateTableSql(that.__tableName, columns), [], (t: SQLTransaction, result: SQLResultSet) => {
                     resolve(result.insertId == 1);
                 }, (t, info) => {
                     that.fail(t, info);
@@ -327,18 +334,16 @@ export class sqlite {
     /**
      * 查询表的所有记录 
      **/
-    static async fromSql<T extends Table>(sql: string, value: Array<any>): Promise<Array<T>> {
-        var objClass: { new(): T };
-        var context = new DbContext<T>(<any>(new objClass()).constructor);
+    static async fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<Array<T>> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.fromSql(sql, value);
     }
 
     /**
      * 数据库表是否存在记录，primaryValue是记录主键值
      */
-    static async exist<T extends Table>(primaryValue: string): Promise<boolean> {
-        var objClass: { new(): T };
-        var context = new DbContext<T>(<any>(new objClass()).constructor);
+    static async exist<T extends Table>(tableInstance: T,primaryValue: string): Promise<boolean> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.exist(primaryValue);
     }
 
@@ -353,15 +358,13 @@ export class sqlite {
      * 修改记录 
      * */
     static async update<T extends Table>(value: T): Promise<boolean> {
-        var objClass: { new(): T };
-        var context = new DbContext<T>(objClass);
+        var context = new DbContext<T>(<any>value.constructor);
         return await context.update(value);
     }
 
     /**执行sql语句 */
-    static async execSql<T extends Table>(sql: string, value: Array<number | string | Date | boolean | any>): Promise<number> {
-        var objClass: { new(): T };
-        var context = new DbContext<T>(<any>(new objClass()).constructor);
+    static async execSql<T extends Table>(tableInstance: T,sql: string, value: Array<number | string | Date | boolean | any>): Promise<number> {    
+        var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.execSql(sql, value);
     }
 

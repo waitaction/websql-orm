@@ -14,9 +14,9 @@ export class AppComponent {
       testData.id = "19";
       testData.password = "123455";
       testData.user_name = "xiaoming";
-      var result = await sqlite.insert<test_table>(testData);
+      //var result = await sqlite.insert<test_table>(testData);
 
-      var datas = await sqlite.fromSql<test_table>("select * from test_table where id=?;", ["19"]);
+      var datas = await sqlite.fromSql<test_table>(new test_table(),"select * from test_table where id=?;", ["19"]);
       if (datas != null && datas.length > 0) {
         console.log(datas);
 
