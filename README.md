@@ -26,7 +26,7 @@ export class student extends Table {
     user_name: string;
 }
 ```
-> 1) 装饰器`@table` 定义student表，关键字student是表名, `student_db` 是数据库名。  
+> 1) 装饰器`@table` 定义student表，类名 student 是表名, `student_db` 是数据库名。  
 > 2) 装饰器 `@column` 定义列，`ColumnType.STRING` 表示该字段是文本类型  
 > 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
 > 4) 每个实体类必须继承 `Table`
@@ -60,13 +60,14 @@ export class student extends Table {
 ``` typescript
 import { sqlite } from 'websql-orm';
 import { student } from './entity/student';
+
 let data = new test_table1();
 data.id = uid;
 data.user_name = "Tom";
 
 let rowsAffected = await sqlite.insert(data);
 
-if (rowsAffected > 1){
+if (rowsAffected > 0){
     let result = await sqlite.fromSql(new student(), 'select * from student where user_name=? ;', ['Tom']);
 }
 ```
