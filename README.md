@@ -55,12 +55,20 @@ export class student extends Table {
 # 操作数据库数据 
 > *`以上述定义的 student 表为例`*
 
-### 从数据表查询记录
+### 示例
 
 ``` typescript
 import { sqlite } from 'websql-orm';
 import { student } from './entity/student';
-let result = await sqlite.fromSql(new student(), 'select * from student where user_name=? ;', ['Tom']);
+let data = new test_table1();
+data.id = uid;
+data.user_name = "Tom";
+
+let rowsAffected = await sqlite.insert(data);
+
+if (rowsAffected > 1){
+    let result = await sqlite.fromSql(new student(), 'select * from student where user_name=? ;', ['Tom']);
+}
 ```
 > `student` 数据库表  
 > 其它方法介绍：略
