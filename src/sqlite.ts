@@ -47,7 +47,7 @@ export function column(type: ColumnType) {
  * 用于定义表的装饰器
  */
 export function table(dbName: string) {
-    return function (target) {
+    return function (target: any) {
         target["__db_name__"] = dbName;
         target["__table_name__"] = target.name;
     };
@@ -133,6 +133,9 @@ export class GenerateSql {
             for (const key in diffValue) {
                 if (diffValue.hasOwnProperty(key)) {
                     if (key == primaryKeyName) {
+                        continue;
+                    }
+                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__") {
                         continue;
                     }
                     const element = diffValue[key];
@@ -229,17 +232,17 @@ export class DbContext<T extends Table>{
     /**
      * 插入记录 
      * */
-    async insert(value: T): Promise<boolean> {
+    async insert(value: T): Promise<number> {
         let sqlResult = this.gSql.gInsertSql(this.__tableName, this.objClass["__columns__"], value);
         let that = this;
         await this.init();
-        let promise = new Promise<boolean>(resolve => {
+        let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
-                    resolve(result.insertId == 1);
+                    resolve(result.rowsAffected);
                 }, (t, info) => {
                     that.fail(t, info);
-                    resolve(false);
+                    resolve(0);
                     return true;
                 });
             });
@@ -249,18 +252,18 @@ export class DbContext<T extends Table>{
     /**
      * 修改记录 
      * */
-    async update(value: T): Promise<boolean> {
+    async update(value: T): Promise<number> {
         let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
         let sqlResult = this.gSql.gUpdateSql(this.__tableName, primaryCol.name, value[primaryCol.name], value);
         let that = this;
         await this.init();
-        let promise = new Promise<boolean>(resolve => {
+        let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
-                    resolve(result.insertId == 1);
+                    resolve(result.rowsAffected);
                 }, (t, info) => {
                     that.fail(t, info);
-                    resolve(false);
+                    resolve(0);
                     return true;
                 });
             });
@@ -342,7 +345,7 @@ export class sqlite {
     /**
      * 数据库表是否存在记录，primaryValue是记录主键值
      */
-    static async exist<T extends Table>(tableInstance: T,primaryValue: string): Promise<boolean> {
+    static async exist<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.exist(primaryValue);
     }
@@ -350,20 +353,20 @@ export class sqlite {
     /**
      * 插入记录 
      * */
-    static async insert<T extends Table>(value: T): Promise<boolean> {
+    static async insert<T extends Table>(value: T): Promise<number> {
         var context = new DbContext<T>(<any>value.constructor);
         return await context.insert(value);
     }
     /**
      * 修改记录 
      * */
-    static async update<T extends Table>(value: T): Promise<boolean> {
+    static async update<T extends Table>(value: T): Promise<number> {
         var context = new DbContext<T>(<any>value.constructor);
         return await context.update(value);
     }
 
     /**执行sql语句 */
-    static async execSql<T extends Table>(tableInstance: T,sql: string, value: Array<number | string | Date | boolean | any>): Promise<number> {    
+    static async execSql<T extends Table>(tableInstance: T, sql: string, value: Array<number | string | Date | boolean | any>): Promise<number> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.execSql(sql, value);
     }
