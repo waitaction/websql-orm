@@ -1,4 +1,4 @@
-`websql-orm` 框架，支持 `chrome`、`nodejs`、`cordova` 的sqlite数据库读写。
+`websql-orm` 框架，支持 `chrome`、`cordova` 的sqlite数据库读写。
 
 # 开始
 
@@ -12,31 +12,30 @@
 }
 ```
 
-拷贝 `src/orm` 文件夹到你的typescript项目目录
 
 # 定义表
 如何使用实体类定义一个表?
 ``` typescript
+import { table, column, ColumnType, Table } from 'websql-orm';
+
 @table("student_db")
-export class user extends BaseMetadata {
+export class student extends Table {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
     id: string;
     @column(ColumnType.STRING)
     user_name: string;
-    @column(ColumnType.STRING ) 
-    password: string;
 }
 ```
-> 1) 装饰器`@table` 定义user表，关键字user是表名, `student_db` 是数据库名。  
+> 1) 装饰器`@table` 定义student表，关键字student是表名, `student_db` 是数据库名。  
 > 2) 装饰器 `@column` 定义列，`ColumnType.STRING` 表示该字段是文本类型  
 > 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
-> 4) 每个实体类必须继承 `DbMeta`
+> 4) 每个实体类必须继承 `Table`
 
 ### 装饰器说明
 
 | 装饰器名         | 描述                      | 示例                                      |
 |-----------------|--------------------------|------------------------------------------|
-| @table          | 定义表                    |  @table("student")                       |
+| @table          | 定义表                    |  @table("student_db")                       |
 | @column         | 定义列                    |  @column(ColumnType.STRING)              |
 
 ### 字段类型枚举
@@ -54,43 +53,18 @@ export class user extends BaseMetadata {
 | ColumnType.ANY          | 任意类型                      | 
 
 # 操作数据库数据 
-> *`以上述定义的 user 表为例`*
+> *`以上述定义的 student 表为例`*
 
 ### 从数据表查询记录
 
 ``` typescript
-let list   = user.query( m => m.name == "xiaoming" );
-let result = user.queryFirst( m => m.id == "test" );
+import { sqlite } from 'websql-orm';
+import { student } from './entity/student';
+let result = await sqlite.fromSql(new student(), 'select * from student where user_name=? ;', ['Tom']);
 ```
-> `user` 数据库表  
-> `query` 与 `queryFirst` 是静态方法
+> `student` 数据库表  
+> 其它方法介绍：略
 
-### 往数据表 添加/修改 记录
-
-``` typescript
-let u:user  = new user();
-u.id        = "guid";
-u.user_name = "小明";
-u.password  = "123456";
-u.save();
-```
-
-当数据是json时，则使用静态方法 `import` 导入记录，导入后会返回 `user` 的实例对像.  
-然后调用 `save` 实例方法 `添加/更新` 数据.
-
-``` typescript
-user.import({
-    id        :"guid",
-    user_name :"小明",
-    password  :"123456"
-}).save();
-```
-
-### 从数据表删除记录
-调用 `delete` 静态方法删除记录
-``` typescript
-let result:boolean = user.delete( m => m.id == "test" ); 
-```
-
+ 
 ## 优化与建议
 websql-orm 目前处于开发阶段，有储多bug和不稳定。  
