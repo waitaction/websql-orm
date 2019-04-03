@@ -1,18 +1,16 @@
 {
   "name": "websql-orm",
-  "version": "2.0.4",
-  "description": "websql-orm for cordova.",
+  "version": "2.1.0",
+  "description": "websql-orm for typescript platform and angular cordova platform.",
   "main": "index.js",
   "scripts": {
-    "test": "npx webpack --config webpack.config.js "
+    "test": "npx webpack --config webpack.config.js ",
+    "prod": "npx webpack --config webpack-prod.config.js"
   },
   "files": [
     "index.js",
     "index.d.ts",
-    "src/*.js",
     "src/*.d.ts",
-    "src/**/*.js",
-    "src/**/*.d.ts",
     "README.md",
     "LICENSE",
     "package.json"

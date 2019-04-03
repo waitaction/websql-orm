@@ -1,9 +1,8 @@
 const path = require('path');
 
 module.exports = {
-    entry: './test/test.ts',
-    mode: 'development',
-    devtool: 'source-map',
+    entry: './index.ts',
+    mode: 'production',//development
     module: {
         rules: [
             {
@@ -17,8 +16,8 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
     output: {
-        filename: 'test-bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        libraryTarget: "umd",
+        filename: 'index.js',
+        path: path.resolve(__dirname, '')
     }
-
 };

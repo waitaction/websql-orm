@@ -1,4 +1,4 @@
-`websql-orm` 框架，支持 `chrome`、`cordova` 的sqlite数据库读写。
+`websql-orm` 框架，支持 `typescript` `angular` `cordova` `chrome` 的sqlite数据库读写。
 
 # 开始
 
@@ -75,6 +75,4 @@ if (rowsAffected > 0){
 > `student` 数据库表  
 > 其它方法介绍：略
 
- 
-## 优化与建议
-websql-orm 目前处于开发阶段，有储多bug和不稳定。  
+
