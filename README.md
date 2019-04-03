@@ -84,14 +84,15 @@ export class test{
 
 | 方法                     | 描述                         | 示例                        |
 |-------------------------|-----------------------------|-----------------------------|
-| sqlite.fromSql          | 查询表记录                    |  await sqlite.fromSql(new student(),'select * from student where user_name=? and id=? ;',['Tom','guid'])  |
-| sqlite.fromSqlFirst     | 查询首条表记录                 | await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ;',['Tom']) |
+| sqlite.fromSql          | 查询表记录                    |  await sqlite.fromSql(new student(),'select * from student where user_name=? and id=? ',['Tom','guid'])  |
+| sqlite.fromSqlFirst     | 查询首条表记录                 | await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ',['Tom']) |
 | sqlite.exist            | 查询记录是否存在               | await sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9')  |
 | sqlite.insert           | 插入记录,返回受影响的行数        |var s = new student();<br> s.id=uid;<br> s.user_name='Tom'; <br> await sqlite.insert(s);|
-| sqlite.update           | 修改记录,返回受影响的行数        |var info = await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ;',['Tom']);<br> info.user_name='Sam'; <br> await sqlite.update(info)|
+| sqlite.update           | 修改记录,返回受影响的行数        |var info = await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ',['Tom']);<br> info.user_name='Sam'; <br> await sqlite.update(info)|
 | sqlite.query            | 查询记录                       | await sqlite.query({ user_name:'Tom'}) |
 | sqlite.queryFirst       | 查询首条记录                   | await sqlite.queryFirst({ user_name:'Tom'})|
 | sqlite.save             | 修改或插入(如果记录不存在)记录    |var s = new student(); <br> s.id=uid; <br> s.user_name='Tom';await sqlite.save(s)|
+| sqlite.execSql             | 执行sql语句   | await sqlite.execSql(new student(),'insert into (id,user_name) values (?,?)',[uid,'Tom'])|
 
 
 
