@@ -53,7 +53,7 @@ export class DbContext<T extends Table>{
                 par.push(element);
             }
         }
-        sql = sql.substr(sql.length - 1, 3);
+        sql = sql.substr(0, sql.length - 3);
         var result = await this.fromSql(sql, par);
         return result;
     }

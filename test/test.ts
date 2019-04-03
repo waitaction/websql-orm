@@ -37,6 +37,14 @@ export class test {
             dataList.push(...[t1, t2]);
             var rowa = await sqlite.insert(dataList);
             console.log(rowa);
+            //测试 query save 方法
+            var info = await sqlite.query(new test_table1(), { id: t1.id });
+            var info1 = await sqlite.queryFirst(new test_table1(), { id: t1.id });
+            console.log(info);
+            console.log(info1);
+            t1.user_name = "修改后的";
+            var result1 = await sqlite.save(t1);
+            console.log(result1);
         }, 0);
     }
 
