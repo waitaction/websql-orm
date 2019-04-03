@@ -35,7 +35,7 @@ export class test {
             t2.id = that.uuid();
             t2.user_name = that.uuid();
             dataList.push(...[t1, t2]);
-            var rowa = await sqlite.insert(data);
+            var rowa = await sqlite.insert(dataList);
             console.log(rowa);
         }, 0);
     }

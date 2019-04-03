@@ -14,7 +14,7 @@ export class sqlite {
      */
     static async fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<Array<T>> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
-        return await context.fromSql(sql, value);
+        return context.fromSql(sql, value);
     }
     /**
      * 返回查询出的首条数据
@@ -39,16 +39,22 @@ export class sqlite {
      */
     static async exist<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
-        return await context.exist(primaryValue);
+        return context.exist(primaryValue);
     }
 
     /**
      * 插入记录,返回受影响的行数
      * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...
      */
-    static async insert<T extends Table>(value: T): Promise<number> {
-        var context = new DbContext<T>(<any>value.constructor);
-        return await context.insert(value);
+    static async insert<T extends Table>(value: T | Array<T>): Promise<number> {
+        if ((value instanceof Array) && value.length > 0) {
+            var context = new DbContext<T>(<any>value[0].constructor);
+            return context.insert(value);
+        }
+        else {
+            var context = new DbContext<T>(<any>value.constructor);
+            return context.insert(value);
+        }
     }
     /**
      * 修改记录,返回受影响的行数
@@ -56,7 +62,7 @@ export class sqlite {
      */
     static async update<T extends Table>(value: T): Promise<number> {
         var context = new DbContext<T>(<any>value.constructor);
-        return await context.update(value);
+        return context.update(value);
     }
 
     /**
@@ -67,23 +73,30 @@ export class sqlite {
      */
     static async execSql<T extends Table>(tableInstance: T, sql: string, value: Array<number | string | Date | boolean | any>): Promise<number> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
-        return await context.execSql(sql, value);
+        return context.execSql(sql, value);
     }
     /**
      * 查询数据
      * @param tableInstance 实体实列,例如 new student()
      * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
      */
-    static async query<T extends Table>(tableInstance: T,param: any):Promise<Array<T>> {
-        throw `待实现该方法`;
+    static async query<T extends Table>(tableInstance: T, param: any): Promise<Array<T>> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
+        return context.query(param);
     }
     /**
      * 查询首条数据
      * @param tableInstance 实体实列,例如 new student()
      * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
      */
-    static async queryFirst<T extends Table>(tableInstance: T,param: any):Promise<T> {
-        throw `待实现该方法`;
+    static async queryFirst<T extends Table>(tableInstance: T, param: any): Promise<T> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
+        var result = await context.query(param);
+        if (result != null) {
+            return result[0]
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -92,7 +105,7 @@ export class sqlite {
      */
     static async save<T extends Table>(value: T): Promise<number> {
         var context = new DbContext<T>(<any>value.constructor);
-        return await context.insert(value);
+        return context.save(value);
     }
 }
 

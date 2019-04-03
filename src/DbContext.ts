@@ -42,6 +42,21 @@ export class DbContext<T extends Table>{
         });
         return promise;
     }
+    async query(param: any): Promise<Array<T>> {
+        await this.init();
+        var sql = `select * from ${this.__tableName} where`;
+        var par = [];
+        for (const key in param) {
+            if (param.hasOwnProperty(key)) {
+                const element = param[key];
+                sql += ` ${key}=? and`
+                par.push(element);
+            }
+        }
+        sql = sql.substr(sql.length - 1, 3);
+        var result = await this.fromSql(sql, par);
+        return result;
+    }
 
     /**
      * 数据库表是否存在记录，primaryValue是记录主键值
@@ -60,37 +75,47 @@ export class DbContext<T extends Table>{
         });
         return promise;
     }
-
+    async save(value: T): Promise<number> {
+        await this.init();
+        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        var isExist = await this.exist(value[primaryCol.name]);
+        if (isExist) {
+            //修改
+            return this.update(value);
+        } else {
+            //插入
+            return this.insert(value);
+        }
+    }
     /**
      * 插入记录 
      * */
     async insert(value: T | Array<T>): Promise<number> {
         let that = this;
         await this.init();
+        if ((value instanceof Array) && value.length > 0) {
+            var rowsAffected = 0;
+            for (let index = 0; index < value.length; index++) {
+                try {
+                    const element = value[index];
+                    var _rowsAffected = await that.insert(element);
+                    rowsAffected += _rowsAffected;
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            return rowsAffected;
+        }
         let promise = new Promise<number>(resolve => {
             that.db.transaction(async (t) => {
-                if ((value instanceof Array) && value.length > 0) {
-                    var rowsAffected = 0;
-                    for (let index = 0; index < value.length; index++) {
-                        try {
-                            const element = value[index];
-                            var _rowsAffected = await that.insert(element);
-                            rowsAffected += _rowsAffected;
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    }
-                    resolve(rowsAffected);
-                } else {
-                    let sqlResult = that.gSql.gInsertSql(this.__tableName, this.objClass["__columns__"], value);
-                    t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
-                        resolve(result.rowsAffected);
-                    }, (t, info) => {
-                        that.fail(t, info);
-                        resolve(0);
-                        return true;
-                    });
-                }
+                let sqlResult = that.gSql.gInsertSql(that.__tableName, that.objClass["__columns__"], value);
+                t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
+                    resolve(result.rowsAffected);
+                }, (t, info) => {
+                    that.fail(t, info);
+                    resolve(0);
+                    return true;
+                });
             });
         });
         return promise;
