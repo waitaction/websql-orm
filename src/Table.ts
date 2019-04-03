@@ -19,5 +19,9 @@ export abstract class Table {
             throw `${this.__tableName} 实体未定义主键，每个实体必须定义一个主键，且只有一个，例如：@column(ColumnType.STRING | ColumnType.PRIMARY)`;
         }
     }
+    /**保存被修改的数据 */
+    async save():Promise<boolean>{
+        throw `待实现该方法`;
+    }
 
 }

@@ -69,7 +69,31 @@ export class sqlite {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return await context.execSql(sql, value);
     }
+    /**
+     * 查询数据
+     * @param tableInstance 实体实列,例如 new student()
+     * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
+     */
+    static async query<T extends Table>(tableInstance: T,param: any):Promise<Array<T>> {
+        throw `待实现该方法`;
+    }
+    /**
+     * 查询首条数据
+     * @param tableInstance 实体实列,例如 new student()
+     * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
+     */
+    static async queryFirst<T extends Table>(tableInstance: T,param: any):Promise<T> {
+        throw `待实现该方法`;
+    }
 
+    /**
+     * 保存记录,如果记录不存在，则插入记录。如果存在，则修改记录
+     * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...
+     */
+    static async save<T extends Table>(value: T): Promise<number> {
+        var context = new DbContext<T>(<any>value.constructor);
+        return await context.insert(value);
+    }
 }
 
 
