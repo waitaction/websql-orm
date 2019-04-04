@@ -81,7 +81,7 @@ export abstract class Table {
                     }
                     //日期类型
                     if ((colInfo.type & ColumnType.DATE) === ColumnType.DATE) {
-                        if (typeof (val) != "object") {
+                        if (!(val instanceof Date)) {
                             throw `表实体${this.__tableName}中的字段${colInfo.name}类型与@column定义的不一致,应为Date类型`;
                         }
                     }
@@ -93,8 +93,8 @@ export abstract class Table {
                     }
                     //数组类型
                     if ((colInfo.type & ColumnType.ARRAY) === ColumnType.ARRAY) {
-                        if (typeof (val) != "object") {
-                            throw `表实体${this.__tableName}中的字段${colInfo.name}类型与@column定义的不一致,应为Array类型`;
+                        if (!(val instanceof Array)) {
+                            throw `表实体${this.__tableName}中的字段${colInfo.name}类型与@column定义的不一致,应为Array<T> 或 [] 类型`;
                         }
                     }
                 }

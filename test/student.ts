@@ -10,4 +10,6 @@ export class student extends Table {
     user_name: string;
     @column(ColumnType.DATE)
     create_time:Date;
+    @column(ColumnType.ARRAY)
+    stu_data:Array<string>;
 }

@@ -207,41 +207,53 @@ export class DbContext<T extends Table>{
     }
     /**从表取到的数据转换成 @column 定义的类型 */
     public convertToColType(val: any, colInfo: ColumnInfo): any {
-        //数值类型
-        if ((colInfo.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
-            return parseFloat(val);
-        }
-        //任意类型
-        if ((colInfo.type & ColumnType.ANY) === ColumnType.ANY) {
-            return val;
-        }
-        //布尔类型
-        if ((colInfo.type & ColumnType.BOOLEAN) === ColumnType.BOOLEAN) {
-            return !!val;
-        }
-        //日期类型
-        if ((colInfo.type & ColumnType.DATE) === ColumnType.DATE) {
-            if (typeof (val) == "string") {
-                return new Date(val.toString());
+        try {
+            //数值类型
+            if ((colInfo.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
+                return parseFloat(val);
             }
-            if (typeof (val) == "number") {
-                let len = val.toString().length;
-                let str = val.toString();
-                if (len < 13) {
-                    for (let index = 0; index < (13 - len); index++) {
-                        str+="0";
-                    }
+            //任意类型
+            if ((colInfo.type & ColumnType.ANY) === ColumnType.ANY) {
+                return val;
+            }
+            //布尔类型
+            if ((colInfo.type & ColumnType.BOOLEAN) === ColumnType.BOOLEAN) {
+                return !!val;
+            }
+            //日期类型
+            if ((colInfo.type & ColumnType.DATE) === ColumnType.DATE) {
+                if (typeof (val) == "string") {
+                    return new Date(val.toString());
                 }
-                return new Date(parseInt(str));
+                if (typeof (val) == "number") {
+                    let len = val.toString().length;
+                    let str = val.toString();
+                    if (len < 13) {
+                        for (let index = 0; index < (13 - len); index++) {
+                            str += "0";
+                        }
+                    }
+                    return new Date(parseInt(str));
+                } else {
+                    return null;
+                }
             }
+            //字符串类型
+            if ((colInfo.type & ColumnType.STRING) === ColumnType.STRING) {
+                return val.toString();
+            }
+            //数组类型
+            if ((colInfo.type & ColumnType.ARRAY) === ColumnType.ARRAY) {
+                try {
+                    return JSON.parse(val.toString());
+                } catch (error) {
+                    return null;
+                }           
+            }
+        } catch (error) {
+            console.error(error);
+            return null;
         }
-        //字符串类型
-        if ((colInfo.type & ColumnType.STRING) === ColumnType.STRING) {
-            return val.toString();
-        }
-        //数组类型
-        if ((colInfo.type & ColumnType.ARRAY) === ColumnType.ARRAY) {
-            return JSON.parse(val.toString());
-        }
+
     }
 }

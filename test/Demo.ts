@@ -11,6 +11,8 @@ export class Demo {
             var data = new student();
             data.id = uid;
             data.user_name = "Tom";
+            data.create_time = new Date();
+            data.stu_data = ['数据1', '数据2'];
             //插入记录
             var insertResult = await sqlite.insert(data);
             if (insertResult) {
@@ -35,6 +37,7 @@ export class Demo {
             var stu1 = new student();
             stu1.id = that.uuid();
             stu1.user_name = "David";
+            stu1.create_time = new Date();
             var stu2 = new student();
             stu2.id = that.uuid();
             stu2.user_name = "David";
@@ -59,8 +62,8 @@ export class Demo {
         for (let i = 0; i < 36; i++) {
             s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
         }
-        s[14] = "4";  
-        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  
+        s[14] = "4";
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
         s[8] = s[13] = s[18] = s[23] = "-";
         let uuid = s.join("");
         return uuid;

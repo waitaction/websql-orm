@@ -60,9 +60,18 @@ export class GenerateSql {
                 const col = __columnsDef[index];
                 cols.push(col.name);
                 qs.push('?');
-                if (value[col.name]!=null){
-                    param.push(value[col.name]);
-                }else{
+                if (value[col.name] != null) {
+                    if (value[col.name] instanceof Date) {
+                        //param.push(value[col.name].toJSON());
+                        param.push(value[col.name]);
+                    } else if (typeof (value[col.name]) == "object") {
+                        param.push(JSON.stringify(value[col.name]));
+                    }
+                    else {
+                        param.push(value[col.name]);
+                    }
+
+                } else {
                     param.push(null);
                 }
             }
@@ -93,7 +102,19 @@ export class GenerateSql {
                     }
                     const element = diffValue[key];
                     cols.push(key);
-                    param.push(element);
+                    if (element != null) {
+                        if (element instanceof Date) {
+                            //param.push(element.toJSON());
+                            param.push(element);
+                        } else if (typeof (element) == "object") {
+                            param.push(JSON.stringify(element));
+                        }
+                        else {
+                            param.push(element);
+                        }
+                    } else {
+                        param.push(null);
+                    }
                 }
             }
         }
