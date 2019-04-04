@@ -11,4 +11,6 @@ export class test_table1 extends Table {
     id: string;
     @column(ColumnType.STRING)
     user_name: string;
+    @column(ColumnType.DATE)
+    create_time:Date;
 }

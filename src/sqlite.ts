@@ -48,10 +48,15 @@ export class sqlite {
      */
     static async insert<T extends Table>(value: T | Array<T>): Promise<number> {
         if ((value instanceof Array) && value.length > 0) {
+            for (let index = 0; index < value.length; index++) {
+                const element: T = value[index];
+                element.checkColDef();
+            }
             var context = new DbContext<T>(<any>value[0].constructor);
             return context.insert(value);
         }
         else {
+            (<T>value).checkColDef();
             var context = new DbContext<T>(<any>value.constructor);
             return context.insert(value);
         }
@@ -61,6 +66,7 @@ export class sqlite {
      * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...
      */
     static async update<T extends Table>(value: T): Promise<number> {
+        value.checkColDef();
         var context = new DbContext<T>(<any>value.constructor);
         return context.update(value);
     }

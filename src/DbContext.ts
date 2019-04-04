@@ -124,10 +124,10 @@ export class DbContext<T extends Table>{
      * 修改记录 
      * */
     async update(value: T): Promise<number> {
-        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        let sqlResult = this.gSql.gUpdateSql(this.__tableName, primaryCol.name, value[primaryCol.name], value);
         let that = this;
         await this.init();
+        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        let sqlResult = this.gSql.gUpdateSql(this.__tableName, primaryCol.name, value[primaryCol.name], value);
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
@@ -190,16 +190,58 @@ export class DbContext<T extends Table>{
     /**
      * 转化到实体元数据 
      * */
-    private convertToMetadata(value: T): T {
+    public convertToMetadata(value: T): T {
         let result: T = new this.objClass();
         result["__diff__"] = {};
         for (const key in value) {
             if (value.hasOwnProperty(key)) {
                 const element = value[key];
-                result[key] = element;
-                result["__diff__"][key] = element;
+                //从表取到的数据转换成定义的类型
+                let colDef = result.__columnsDef.find(m => m.name == key);
+                var colValue = this.convertToColType(element, colDef);
+                result["__diff__"][key] = colValue;
+                result[key] = colValue;
             }
         }
         return result;
+    }
+    /**从表取到的数据转换成 @column 定义的类型 */
+    public convertToColType(val: any, colInfo: ColumnInfo): any {
+        //数值类型
+        if ((colInfo.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
+            return parseFloat(val);
+        }
+        //任意类型
+        if ((colInfo.type & ColumnType.ANY) === ColumnType.ANY) {
+            return val;
+        }
+        //布尔类型
+        if ((colInfo.type & ColumnType.BOOLEAN) === ColumnType.BOOLEAN) {
+            return !!val;
+        }
+        //日期类型
+        if ((colInfo.type & ColumnType.DATE) === ColumnType.DATE) {
+            if (typeof (val) == "string") {
+                return new Date(val.toString());
+            }
+            if (typeof (val) == "number") {
+                let len = val.toString().length;
+                let str = val.toString();
+                if (len < 13) {
+                    for (let index = 0; index < (13 - len); index++) {
+                        str+="0";
+                    }
+                }
+                return new Date(parseInt(str));
+            }
+        }
+        //字符串类型
+        if ((colInfo.type & ColumnType.STRING) === ColumnType.STRING) {
+            return val.toString();
+        }
+        //数组类型
+        if ((colInfo.type & ColumnType.ARRAY) === ColumnType.ARRAY) {
+            return JSON.parse(val.toString());
+        }
     }
 }

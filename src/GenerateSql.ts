@@ -60,7 +60,11 @@ export class GenerateSql {
                 const col = __columnsDef[index];
                 cols.push(col.name);
                 qs.push('?');
-                param.push(value[col.name]);
+                if (value[col.name]!=null){
+                    param.push(value[col.name]);
+                }else{
+                    param.push(null);
+                }
             }
             sql += " (" + cols.join(',') + ") values (" + qs.join(',') + ")";
             let tuple: [string, Array<any>] = [sql, param];

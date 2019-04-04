@@ -9,7 +9,7 @@ export class test {
             //写入数据
             var data = new test_table1();
             data.id = uid;
-            data.user_name = "Sam";
+            data.user_name = <any>2121;
             var ires = await sqlite.insert(data);
             if (ires) {
                 console.log("写入数据成功");
@@ -17,8 +17,9 @@ export class test {
                 var result = results[0];
                 console.log(result);
                 result.user_name = "Sam2";
-                var ures = await sqlite.update(result);
-                if (ures) {
+                var saveResult = await result.save();
+                //var ures = await sqlite.update(result);
+                if (saveResult) {
                     console.log("修改记录成功");
                 } else {
                     console.warn("修改记录失败");
@@ -47,6 +48,12 @@ export class test {
             console.log(result1);
         }, 0);
     }
+
+
+
+
+
+
 
     /**
      * 生成伪guid
