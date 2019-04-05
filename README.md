@@ -74,7 +74,7 @@ var info = await sqlite.fromSqlFirst(new student(),
 
 **sqlite.exist** `查询记录是否存在，返回true或false`
 ``` typescript
-var result = sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
+var result = await sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
 ```
 
 **sqlite.insert** `插入记录,返回受影响的行数`
@@ -91,7 +91,7 @@ var info = await sqlite.fromSqlFirst(new student(),
             'select * from student where user_name=? ',
             ['Tom']);
 info.user_name = 'Sam'; 
-var result = info.save(); //或者 var result = await sqlite.update(info)
+var result = await info.save(); //或者 var result = await sqlite.update(info)
 ```
 
 **sqlite.query** `查询记录，返回记录列表`
