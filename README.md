@@ -59,21 +59,21 @@ export class student extends Table {
 
 ### `websql-orm` 方法列表
 
-**sqlite.fromSql** 查询表记录
+**sqlite.fromSql** `查询表记录`
 ``` typescript
 var list = await sqlite.fromSql(new student(),'select * from student where user_name=? and id=? ',['Tom','guid']);
 ```
-**sqlite.fromSqlFirst** 查询首条表记录
+**sqlite.fromSqlFirst** `查询首条表记录`
 ``` typescript
 var info = await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ',['Tom']);
 ```
 
-**sqlite.exist** 查询记录是否存在
+**sqlite.exist** `查询记录是否存在`
 ``` typescript
 var result = sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
 ```
 
-**sqlite.insert** 插入记录,返回受影响的行数
+**sqlite.insert** `插入记录,返回受影响的行数`
 ``` typescript
 var stu = new student();
 stu.id=uid;
@@ -81,24 +81,24 @@ stu.user_name='Tom';
 var result = await sqlite.insert(stu);
 ```
 
-**sqlite.update** 修改记录,返回受影响的行数
+**sqlite.update** `修改记录,返回受影响的行数`
 ``` typescript
 var info = await sqlite.fromSqlFirst(new student(),'select * from student where user_name=? ',['Tom']);
 info.user_name='Sam'; 
 var result = info.save(); //或者 var result = await sqlite.update(info)
 ```
 
-**sqlite.query** 查询记录
+**sqlite.query** `查询记录`
 ``` typescript
 var list = await sqlite.query({ user_name:'Tom'});
 ```
 
-**sqlite.queryFirst** 查询首条记录
+**sqlite.queryFirst** `查询首条记录`
 ``` typescript
 var info = await sqlite.queryFirst({ user_name:'Tom'});
 ```
 
-**sqlite.execSql** 执行sql语句
+**sqlite.execSql** `执行sql语句`
 ``` typescript
 var result = await sqlite.execSql(new student(),'insert into (id,user_name) values (?,?)',[uid,'Tom']);
 ```
