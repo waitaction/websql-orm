@@ -61,7 +61,8 @@ export class student extends Table {
 
 **sqlite.fromSql** `查询表记录`
 ``` typescript
-var list = await sqlite.fromSql(new student(),'select * from student where user_name=? and id=? ',['Tom','guid']);
+var list = await sqlite.fromSql(new student(),
+    'select * from student where user_name=? and id=? ',['Tom','guid']);
 ```
 **sqlite.fromSqlFirst** `查询首条表记录`
 ``` typescript
