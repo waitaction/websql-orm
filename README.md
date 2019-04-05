@@ -80,8 +80,8 @@ var result = sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
 **sqlite.insert** `插入记录,返回受影响的行数`
 ``` typescript
 var stu = new student();
-stu.id=uid;
-stu.user_name='Tom'; 
+stu.id = uid;
+stu.user_name = 'Tom'; 
 var result = await sqlite.insert(stu);
 ```
 
@@ -90,7 +90,7 @@ var result = await sqlite.insert(stu);
 var info = await sqlite.fromSqlFirst(new student(),
             'select * from student where user_name=? ',
             ['Tom']);
-info.user_name='Sam'; 
+info.user_name = 'Sam'; 
 var result = info.save(); //或者 var result = await sqlite.update(info)
 ```
 
