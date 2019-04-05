@@ -34,24 +34,24 @@ export class student extends Table {
 
 ### 装饰器说明
 
-| 装饰器名         | 描述                      | 示例                                      |
-|-----------------|--------------------------|------------------------------------------|
-| @table          | 定义表                    |  @table("student_db")                       |
-| @column         | 定义列                    |  @column(ColumnType.STRING)              |
+| 装饰器名 | 描述   | 示例                       |
+| -------- | ------ | -------------------------- |
+| @table   | 定义表 | @table("student_db")       |
+| @column  | 定义列 | @column(ColumnType.STRING) |
 
 ### 字段类型枚举
 
 表字段枚举值与TypeScript基本类型保持一致
 
-| 字段类型枚举              | 描述                         | 
-|-------------------------|-----------------------------|
-| ColumnType.PRIMARY      | 主键                         |
-| ColumnType.BOOLEAN      | 布尔值                       | 
-| ColumnType.NUMBER       | 数值                         |
-| ColumnType.STRING       | 字符串                       | 
-| ColumnType.ARRAY        | 数组                         |
-| ColumnType.DATE         | 日期                         | 
-| ColumnType.ANY          | 任意类型                      | 
+| 字段类型枚举       | 描述     |
+| ------------------ | -------- |
+| ColumnType.PRIMARY | 主键     |
+| ColumnType.BOOLEAN | 布尔值   |
+| ColumnType.NUMBER  | 数值     |
+| ColumnType.STRING  | 字符串   |
+| ColumnType.ARRAY   | 数组     |
+| ColumnType.DATE    | 日期     |
+| ColumnType.ANY     | 任意类型 |
 
 # 如何使用 
 > *`以上述定义的 student 表为例`*
@@ -59,20 +59,20 @@ export class student extends Table {
 
 ### `websql-orm` 方法列表
 
-**sqlite.fromSql** `查询表记录`
+**sqlite.fromSql** `查询表记录，返回记录列表`
 ``` typescript
 var list = await sqlite.fromSql(new student(),
             'select * from student where user_name=? and id=? ',
             ['Tom','guid']);
 ```
-**sqlite.fromSqlFirst** `查询首条表记录`
+**sqlite.fromSqlFirst** `查询首条表记录，返回首条记录`
 ``` typescript
 var info = await sqlite.fromSqlFirst(new student(),
             'select * from student where user_name=? ',
             ['Tom']);
 ```
 
-**sqlite.exist** `查询记录是否存在`
+**sqlite.exist** `查询记录是否存在，返回true或false`
 ``` typescript
 var result = sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
 ```
@@ -94,7 +94,7 @@ info.user_name='Sam';
 var result = info.save(); //或者 var result = await sqlite.update(info)
 ```
 
-**sqlite.query** `查询记录`
+**sqlite.query** `查询记录，返回记录列表`
 ``` typescript
 var list = await sqlite.query({ user_name:'Tom'});
 ```
@@ -104,11 +104,11 @@ var list = await sqlite.query({ user_name:'Tom'});
 var info = await sqlite.queryFirst({ user_name:'Tom'});
 ```
 
-**sqlite.execSql** `执行sql语句`
+**sqlite.execSql** `执行sql语句，返回受影响行数`
 ``` typescript
 var result = await sqlite.execSql(new student(),
                 'insert into (id,user_name) values (?,?)',
-                [uid,'Tom']);
+                ['b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9','Tom']);
 ```
 
 
