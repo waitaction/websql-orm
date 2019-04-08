@@ -16,7 +16,8 @@
 >提示：不要安装2.1.0之前的版本，2.1.0之前的版本是调试阶段的版本，无法使用
 
 `cordova plugin add cordova-sqlite-storage`
->若在在cordova项目中，则需要安装cordova插件兼容iOS
+>若在 cordova项目中，则需要安装cordova插件兼容iOS
+
 # 定义表
 如何使用实体类定义一个表?
 ``` typescript

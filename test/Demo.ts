@@ -11,8 +11,11 @@ export class Demo {
             var data = new student();
             data.id = uid;
             data.user_name = "Tom";
+            data.age = 16;
+            data.isGirl = false;
             data.create_time = new Date();
             data.stu_data = ['数据1', '数据2'];
+            data.other_data = { age: 18, isGril: true };
             //插入记录
             var insertResult = await sqlite.insert(data);
             if (insertResult) {

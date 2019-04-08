@@ -214,11 +214,29 @@ export class DbContext<T extends Table>{
             }
             //任意类型
             if ((colInfo.type & ColumnType.ANY) === ColumnType.ANY) {
-                return val;
+                if (typeof (val) == "string") {
+                    return JSON.parse(val.toString());
+                }
+                if (typeof (val) == "number") {
+                    return val;
+                } else {
+                    return val;
+                }
             }
             //布尔类型
             if ((colInfo.type & ColumnType.BOOLEAN) === ColumnType.BOOLEAN) {
-                return !!val;
+                if (val == "" || val == null) {
+                    return null;
+                } else {
+                    if (val === "true") {
+                        return true;
+                    }
+                    else if (val === "false") {
+                        return false;
+                    } else if (typeof (val) == "number") {
+                        return !!val;
+                    }
+                }
             }
             //日期类型
             if ((colInfo.type & ColumnType.DATE) === ColumnType.DATE) {
@@ -248,7 +266,7 @@ export class DbContext<T extends Table>{
                     return JSON.parse(val.toString());
                 } catch (error) {
                     return null;
-                }           
+                }
             }
         } catch (error) {
             console.error(error);
