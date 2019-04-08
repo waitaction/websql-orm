@@ -42,8 +42,8 @@ export class student extends Table {
 | ---------- | ---------------------------------------------- | ----------------------------- |
 | @database  | 定义表                                         | @database("student_db")       |
 | @column    | 定义列                                         | @column(ColumnType.STRING)    |
-| @reference | 定义引用。参数1：引用的表名，参数2：引用的列名 | @reference('class_info','id') |
->定义引用详见高级部分
+| @reference | 定义外键引用                                     | @reference('class_info','id') |
+>定义**外键引用**详见高级部分
 
 ### 字段类型枚举
 
