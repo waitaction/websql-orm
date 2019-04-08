@@ -258,7 +258,11 @@ export class DbContext<T extends Table>{
             }
             //字符串类型
             if ((colInfo.type & ColumnType.STRING) === ColumnType.STRING) {
-                return val.toString();
+                if (val != null) {
+                    return val.toString();
+                } else {
+                    return null;
+                }
             }
             //数组类型
             if ((colInfo.type & ColumnType.ARRAY) === ColumnType.ARRAY) {

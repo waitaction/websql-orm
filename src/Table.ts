@@ -1,6 +1,7 @@
 import { ColumnInfo } from "./ColumnInfo";
 import { ColumnType } from "./ColumnType";
 import { DbContext, GenerateSql } from "..";
+import { ReferenceInfo } from "./ReferenceInfo";
 
 /**
  * 由实体类继承该类，操作sqlite 
@@ -12,10 +13,12 @@ export abstract class Table {
     public __primaryColDef: ColumnInfo;
     /**表名 */
     public __tableName: string;
+    public __refsDef: Array<ReferenceInfo>;
     constructor() {
         this.__columnsDef = this.constructor["__columns__"];
         this.__primaryColDef = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        this.__tableName = this.constructor["__table_name__"]
+        this.__tableName = this.constructor["__table_name__"];
+        this.__refsDef = this.constructor["__references__"];
         if (this.__primaryColDef == null) {
             throw `${this.__tableName} 实体未定义主键，每个实体必须定义一个主键，且只有一个，例如：@column(ColumnType.STRING | ColumnType.PRIMARY)`;
         }
@@ -38,6 +41,35 @@ export abstract class Table {
         let result = await context.execSql(sql[0], sql[1]);
         return result > 0;
     }
+
+    /**
+     * 获取引用的表记录 
+     * */
+    async getRefData<T extends Table>(tableInstance: T): Promise<Array<T> | Array<{ name: string, data: Array<T> }>> {
+        var result = [];
+        var context = new DbContext<T>(<any>tableInstance.constructor);
+        var refs = this.__refsDef.filter(m => m.refTableName == tableInstance.__tableName);
+
+        if (refs != null && refs.length > 1) {
+            for (let index = 0; index < refs.length; index++) {
+                const element = refs[index];
+                let obj = {};
+                obj[element.refKeyName] = this[element.foreignKeyName];
+                let list = await context.query(obj);
+                result.push({ name: element.foreignKeyName, data: list });
+            }
+        } else if (refs != null && refs.length == 1) {
+            for (let index = 0; index < refs.length; index++) {
+                const element = refs[index];
+                let obj = {};
+                obj[element.refKeyName] = this[element.foreignKeyName];
+                let list = await context.query(obj);
+                result.push(...list);
+            }
+        }
+        return result;
+    }
+
 
     /**
      * 查询被修改的字段信息

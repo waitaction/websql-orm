@@ -23,7 +23,7 @@
 ``` typescript
 import { table, column, ColumnType, Table } from 'websql-orm';
 
-@table("student_db")
+@database("student_db")
 export class student extends Table {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
     id: string;
@@ -31,17 +31,19 @@ export class student extends Table {
     user_name: string;
 }
 ```
-> 1) 装饰器`@table` 定义student表，类名 student 是表名, `student_db` 是数据库名。  
+> 1) 装饰器`@database` 定义student表，类名 student 是表名, `student_db` 是数据库名。  
 > 2) 装饰器 `@column` 定义列，`ColumnType.STRING` 表示该字段是文本类型  
 > 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
 > 4) 每个实体类必须继承 `Table`
 
 ### 装饰器说明
 
-| 装饰器名 | 描述   | 示例                       |
-| -------- | ------ | -------------------------- |
-| @table   | 定义表 | @table("student_db")       |
-| @column  | 定义列 | @column(ColumnType.STRING) |
+| 装饰器名   | 描述                                           | 示例                          |
+| ---------- | ---------------------------------------------- | ----------------------------- |
+| @database  | 定义表                                         | @database("student_db")       |
+| @column    | 定义列                                         | @column(ColumnType.STRING)    |
+| @reference | 定义引用。参数1：引用的表名，参数2：引用的列名 | @reference('class_info','id') |
+>定义引用详见高级部分
 
 ### 字段类型枚举
 
@@ -195,5 +197,41 @@ export class Demo {
 
 ```
 
+# 高级
 
+### 定义引用
+如何定义外键引用？
+``` typescript
+import { table, column, ColumnType, Table } from 'websql-orm';
 
+/*班级信息表*/
+@database("student_db")
+export class class_info extends Table {
+    @column(ColumnType.PRIMARY | ColumnType.STRING)
+    id: string;
+    @column(ColumnType.STRING)
+    name: string;
+}
+
+/*学生信息表*/
+@database("student_db")
+export class student extends Table {
+
+    @column(ColumnType.STRING | ColumnType.PRIMARY)
+    id: string;
+
+    @column(ColumnType.STRING)
+    user_name: string;
+    
+    /*定义外键，引用班级信息表*/
+    @reference("class_info", "id")
+    class_id:string;
+}
+```
+
+查询外键引用的外表数据
+``` typescript
+    var stu = await sqlite.fromSqlFirst(new student(), "select * from student where id=?", [uid]);
+    var refData = await stu.getRefData(new class_info());
+    console.log(refData);
+```

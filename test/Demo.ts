@@ -1,3 +1,4 @@
+import { class_info } from './class_info';
 
 import { sqlite } from "../src/sqlite";
 import { student } from "./student";
@@ -7,6 +8,7 @@ export class Demo {
         var that = this;
         setTimeout(async () => {
             var uid = that.uuid();
+            var uid2 = that.uuid();
             //实体实例
             var data = new student();
             data.id = uid;
@@ -16,13 +18,23 @@ export class Demo {
             data.create_time = new Date();
             data.stu_data = ['数据1', '数据2'];
             data.other_data = { age: 18, isGril: true };
+            data.class_id = uid2;
             //插入记录
             var insertResult = await sqlite.insert(data);
+
+            var data2 = new class_info();
+            data2.id = uid2;
+            data2.name = "测试引用数据";
+            var insertResult2 = await sqlite.insert(data2);
+
             if (insertResult) {
                 //使用sql语句查询刚刚插入的记录
                 var result = await sqlite.fromSqlFirst(new student(), "select * from student where id=?", [uid]);
                 console.log("使用sql语句查询刚刚插入的记录：")
                 console.log(result);
+                console.log("读取引用数据：");
+                var refData = await await result.getRefData(new class_info());
+                console.log(refData)
                 //修改user_name
                 result.user_name = "Sam";
                 //直接调用save()方法保存
