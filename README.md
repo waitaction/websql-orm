@@ -5,7 +5,7 @@
 [![downloads](https://badgen.net/npm/dt/websql-orm)](https://www.npmjs.com/package/websql-orm)
 
 [中文文档](README-CN.md)
-# 开始
+# Usage
 
 `websql-orm` use `TypeScript` language, needs to be in before using `tsconfig.json` add a decorator configuration items to enable the decorator features.
 
@@ -240,3 +240,5 @@ var stu = await sqlite.fromSqlFirst(new student(), "select * from student where 
 var refData = await stu.getRefData(new class_info());
 console.log(refData);
 ```
+## License
+Copyright (c) 2019, Sam Chen. (ISC License)
