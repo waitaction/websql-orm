@@ -1,6 +1,11 @@
 import { ColumnInfo } from "./ColumnInfo";
 import { ColumnType } from "./ColumnType";
 
+/*备注：
+select sql from sqlite_master where type='table' and name = 'student';
+select * from sqlite_master where name = ? and sql like '%' || ? || '%';
+*/
+
 /**
  * 生成sql语句
  */
@@ -124,4 +129,7 @@ export class GenerateSql {
         return tuple;
 
     }
+
+
+
 }

@@ -43,6 +43,16 @@ export class sqlite {
     }
 
     /**
+     * 删除记录，primaryValue是表记录的主键值
+     * @param tableInstance 实体实列,例如 new student()
+     * @param primaryValue 主键值
+     */
+    static async delete<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
+        return context.delete(primaryValue);
+    }
+
+    /**
      * 插入记录,返回受影响的行数
      * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...
      */

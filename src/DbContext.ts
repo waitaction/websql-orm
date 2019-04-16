@@ -75,6 +75,27 @@ export class DbContext<T extends Table>{
         });
         return promise;
     }
+    /**
+     * 删除记录，primaryValue是记录主键值
+     */
+    async delete(primaryValue: string): Promise<boolean> {
+        let that = this;
+        await this.init();
+        let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
+        let sql = `delete from ${this.__tableName} where ${primaryCol.name} = ? ;`;
+        let promise = new Promise<boolean>(resolve => {
+            that.db.transaction(async (t)=> {
+                t.executeSql(sql, [primaryValue], (t: SQLTransaction, result: SQLResultSet) => {
+                    resolve(result.rowsAffected > 0);
+                }, (t, info) => {
+                    resolve(false);
+                    return true;
+                });
+            });
+        });
+        return promise;
+    }
+
     async save(value: T): Promise<number> {
         await this.init();
         let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);

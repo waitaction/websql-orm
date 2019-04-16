@@ -122,6 +122,10 @@ var result = await sqlite.execSql(new student(),
                 ['b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9','Tom']);
 ```
 
+**sqlite.delete** `删除记录`
+``` typescript
+var delResult = await sqlite.delete(new student(),'291d853d-021b-4a66-9322-9d32eb27eb27');
+```
 
 ### 示例
 

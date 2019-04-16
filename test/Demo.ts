@@ -1,5 +1,4 @@
 import { class_info } from './class_info';
-
 import { sqlite } from "../src/sqlite";
 import { student } from "./student";
 
@@ -35,6 +34,9 @@ export class Demo {
                 console.log("读取引用数据：");
                 var refData = await await result.getRefData(new class_info());
                 console.log(refData)
+                console.log("删除记录：")
+                var delResult= await sqlite.delete(new student(),data.id);
+                console.log(delResult);
                 //修改user_name
                 result.user_name = "Sam";
                 //直接调用save()方法保存
