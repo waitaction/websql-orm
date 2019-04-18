@@ -102,7 +102,7 @@ export class GenerateSql {
                     if (key == primaryKeyName) {
                         continue;
                     }
-                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__") {
+                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__" || key=="__refsDef") {
                         continue;
                     }
                     const element = diffValue[key];
