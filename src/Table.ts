@@ -1,7 +1,8 @@
 import { ColumnInfo } from "./ColumnInfo";
 import { ColumnType } from "./ColumnType";
-import { DbContext, GenerateSql } from "..";
 import { ReferenceInfo } from "./ReferenceInfo";
+import { DbContext } from "./DbContext";
+import { GenerateSql } from "./GenerateSql";
 
 /**
  * 由实体类继承该类，操作sqlite 

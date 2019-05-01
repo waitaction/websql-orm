@@ -24,6 +24,7 @@ export class Demo {
             var data2 = new class_info();
             data2.id = uid2;
             data2.name = "测试引用数据";
+            //data2.indexxx=1;
             var insertResult2 = await sqlite.insert(data2);
 
             if (insertResult) {
@@ -35,7 +36,7 @@ export class Demo {
                 var refData = await await result.getRefData(new class_info());
                 console.log(refData)
                 console.log("删除记录：")
-                var delResult= await sqlite.delete(new student(),data.id);
+                var delResult = await sqlite.delete(new student(), data.id);
                 console.log(delResult);
                 //修改user_name
                 result.user_name = "Sam";

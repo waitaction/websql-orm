@@ -1,4 +1,4 @@
-import { table, column, database } from "../src/Decorator";
+import {   column, database } from "../src/Decorator";
 import { ColumnType } from "../src/ColumnType";
 import { Table } from "../src/Table";
 
@@ -8,4 +8,10 @@ export class class_info extends Table {
     id: string;
     @column(ColumnType.STRING)
     name: string;
+
+    @column(ColumnType.NUMBER)
+    index:number;
+
+    @column(ColumnType.DATE)
+    create_time:Date;
 }

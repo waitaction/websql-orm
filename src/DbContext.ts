@@ -44,7 +44,7 @@ export class DbContext<T extends Table>{
     }
     async query(param: any): Promise<Array<T>> {
         await this.init();
-        var sql = `select * from ${this.__tableName} where`;
+        var sql = `select * from \`${this.__tableName}\` where`;
         var par = [];
         for (const key in param) {
             if (param.hasOwnProperty(key)) {
@@ -65,7 +65,7 @@ export class DbContext<T extends Table>{
         let that = this;
         await this.init();
         let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
-        let sql = `select * from ${this.__tableName} where ${primaryCol.name} = ? ;`;
+        let sql = `select * from \`${this.__tableName}\` where \`${primaryCol.name}\` = ? ;`;
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, [primaryValue], (b, result) => {

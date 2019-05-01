@@ -18,7 +18,7 @@ export class GenerateSql {
      * 生成创建表sql语句
      */
     gCreateTableSql(__tableName: string, columnDef: Array<ColumnInfo>): string {
-        let sql = "CREATE TABLE IF NOT EXISTS " + __tableName;
+        let sql = "CREATE TABLE IF NOT EXISTS " + '`' + __tableName + '`';
         let colSql = [];
         if (columnDef instanceof Array && columnDef.length > 0) {
             for (let index = 0; index < columnDef.length; index++) {
@@ -43,7 +43,7 @@ export class GenerateSql {
                 if ((element.type & ColumnType.PRIMARY) === ColumnType.PRIMARY) {
                     _type += " PRIMARY KEY NOT NULL";
                 }
-                colSql.push(element.name + ' ' + _type);
+                colSql.push('`' + element.name + '`' + ' ' + _type);
             }
 
         }
@@ -56,14 +56,14 @@ export class GenerateSql {
      */
     gInsertSql(__tableName: string, __columnsDef: any, value: any): [string, Array<any>] {
         let that = this;
-        let sql: string = `insert into ${__tableName} `;
+        let sql: string = `insert into \`${__tableName}\` `;
         let cols = [];
         let qs = [];
         if (__columnsDef instanceof Array && __columnsDef.length > 0) {
             let param: Array<any> = [];
             for (let index = 0; index < __columnsDef.length; index++) {
                 const col = __columnsDef[index];
-                cols.push(col.name);
+                cols.push('`' + col.name + '`');
                 qs.push('?');
                 if (value[col.name] != null) {
                     if (value[col.name] instanceof Date) {
@@ -102,11 +102,11 @@ export class GenerateSql {
                     if (key == primaryKeyName) {
                         continue;
                     }
-                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__" || key=="__refsDef") {
+                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__" || key == "__refsDef") {
                         continue;
                     }
                     const element = diffValue[key];
-                    cols.push(key);
+                    cols.push('`' + key + '`');
                     if (element != null) {
                         if (element instanceof Date) {
                             //param.push(element.toJSON());

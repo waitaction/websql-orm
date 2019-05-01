@@ -6,3 +6,4 @@ export * from './src/DbContext';
 export * from './src/GenerateSql';
 export * from './src/Table';
 export * from './src/sqlite';
+export * from './src/Sql';
