@@ -1,3 +1,4 @@
+import { DebugLog } from './DebugLog';
 import { ColumnInfo } from "./ColumnInfo";
 import { ColumnType } from "./ColumnType";
 
@@ -48,6 +49,7 @@ export class GenerateSql {
 
         }
         sql = sql + " (" + colSql.join(', ') + ")";
+        DebugLog.debug(sql);
         return sql;
     }
 
@@ -81,6 +83,8 @@ export class GenerateSql {
                 }
             }
             sql += " (" + cols.join(',') + ") values (" + qs.join(',') + ")";
+            DebugLog.debug(sql);
+            DebugLog.debug(param);
             let tuple: [string, Array<any>] = [sql, param];
             return tuple;
         } else {
@@ -126,6 +130,8 @@ export class GenerateSql {
         sql += cols.join(" = ? , ") + " = ? where " + primaryKeyName + " = " + "?" + " ;";
         param.push(primaryKeyValue);
         let tuple: [string, Array<any>] = [sql, param];
+        DebugLog.debug(sql);
+        DebugLog.debug(param);
         return tuple;
 
     }

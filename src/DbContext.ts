@@ -1,3 +1,4 @@
+import { DebugLog } from './DebugLog';
 import { Table } from "./Table";
 import { ColumnInfo } from "./ColumnInfo";
 import { GenerateSql } from "./GenerateSql";
@@ -15,7 +16,7 @@ export class DbContext<T extends Table>{
         this.__tableName = this.objClass["__table_name__"];
         this.dbName = this.objClass["__db_name__"];
         this.__columnsDef = this.objClass["__columns__"];
-        this.db = window.openDatabase(this.dbName, '1.0.0', '', 65536 * 10);
+        this.db = window.openDatabase(this.dbName, '1.0.0', '', 1024 * 1024 * 10);
     }
 
 
@@ -27,7 +28,7 @@ export class DbContext<T extends Table>{
         let that = this;
         await this.init();
         let promise = new Promise<Array<T>>(resolve => {
-            that.db.transaction((t) => {
+            that.db.transaction(function (t) {
                 t.executeSql(sql, value, (b, result) => {
                     var datas: Array<T> = [];
                     if (result.rows != null && result.rows.length > 0) {
@@ -84,8 +85,9 @@ export class DbContext<T extends Table>{
         let primaryCol = this.__columnsDef.find(m => (m.type & ColumnType.PRIMARY) == ColumnType.PRIMARY);
         let sql = `delete from ${this.__tableName} where ${primaryCol.name} = ? ;`;
         let promise = new Promise<boolean>(resolve => {
-            that.db.transaction(async (t)=> {
+            that.db.transaction(function (t) {
                 t.executeSql(sql, [primaryValue], (t: SQLTransaction, result: SQLResultSet) => {
+                    DebugLog.debug(`delete result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected > 0);
                 }, (t, info) => {
                     resolve(false);
@@ -113,31 +115,37 @@ export class DbContext<T extends Table>{
      * */
     async insert(value: T | Array<T>): Promise<number> {
         let that = this;
-        await this.init();
-        if ((value instanceof Array) && value.length > 0) {
-            var rowsAffected = 0;
-            for (let index = 0; index < value.length; index++) {
-                try {
-                    const element = value[index];
-                    var _rowsAffected = await that.insert(element);
-                    rowsAffected += _rowsAffected;
-                } catch (error) {
-                    console.error(error);
+        let promise = new Promise<number>(async resolve => {
+            await that.init();
+            if ((value instanceof Array) && value.length > 0) {
+                var rowsAffected = 0;
+                for (let index = 0; index < value.length; index++) {
+                    try {
+                        let element = value[index];
+                        var _rowsAffected = await that.insert(element);
+                        rowsAffected += _rowsAffected;
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
+                DebugLog.debug(`insert result: ${rowsAffected}`);
+                resolve(rowsAffected);
+                return;
             }
-            return rowsAffected;
-        }
-        let promise = new Promise<number>(resolve => {
-            that.db.transaction(async (t) => {
-                let sqlResult = that.gSql.gInsertSql(that.__tableName, that.objClass["__columns__"], value);
+
+            let sqlResult = that.gSql.gInsertSql(that.__tableName, that.objClass["__columns__"], value);
+            that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
+                    DebugLog.debug(`insert result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
-                }, (t, info) => {
+                }, function (t, info) {
                     that.fail(t, info);
                     resolve(0);
                     return true;
                 });
             });
+            
+
         });
         return promise;
     }
@@ -152,12 +160,14 @@ export class DbContext<T extends Table>{
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
+                    DebugLog.debug(`update result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
-                }, (t, info) => {
+                }, function (t, info) {
                     that.fail(t, info);
                     resolve(0);
                     return true;
                 });
+
             });
         });
         return promise;
@@ -170,6 +180,7 @@ export class DbContext<T extends Table>{
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, value, (b, result) => {
+                    DebugLog.debug(`execSql result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
                 }, that.fail);
             });
@@ -178,6 +189,7 @@ export class DbContext<T extends Table>{
     }
 
     fail(transaction: SQLTransaction, error: SQLError): boolean {
+        DebugLog.debug(error);
         console.error(error.message);
         return true;
     }
@@ -199,7 +211,7 @@ export class DbContext<T extends Table>{
             that.db.transaction(function (t) {
                 t.executeSql(that.gSql.gCreateTableSql(that.__tableName, columns), [], (t: SQLTransaction, result: SQLResultSet) => {
                     resolve(result.insertId == 1);
-                }, (t, info) => {
+                }, function (t, info) {
                     that.fail(t, info);
                     resolve(false);
                     return true;
@@ -224,10 +236,15 @@ export class DbContext<T extends Table>{
                 result[key] = colValue;
             }
         }
+        DebugLog.debug("convertToMetadata:");
+        DebugLog.debug(result);
         return result;
     }
     /**从表取到的数据转换成 @column 定义的类型 */
     public convertToColType(val: any, colInfo: ColumnInfo): any {
+        DebugLog.debug(`convertToColType:`);
+        DebugLog.debug(val);
+        DebugLog.debug(colInfo);
         try {
             //数值类型
             if ((colInfo.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
