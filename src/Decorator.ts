@@ -1,6 +1,7 @@
 import { ColumnType } from "./ColumnType";
 import { ColumnInfo } from "./ColumnInfo";
 import { ReferenceInfo } from "./ReferenceInfo";
+import { Table } from "./Table";
 
 /**
  * 用于定义列的装饰器
@@ -24,7 +25,7 @@ export function column(type: ColumnType) {
  * 用于定义表的装饰器
  */
 export function table(dbName: string = null) {
-    
+
     console.warn(`@table is about to be deprecated, please use @database(dbName) decorator instead. \r\n @table 即将废弃，请改用 @database(dbName) 装饰器`)
     // if (dbName != null) {
     //     throw `@table only supports defining tables in later versions, no parameters are passed in. Please add @database(dbName) decorator. 
@@ -49,15 +50,17 @@ export function database(dbName: string) {
 
 /**
  * 定义外键引用的装饰器
- * @param tableName 表名
- * @param keyName 外键名
+ * @param keyName 字段名
+ * @param refTableName 引用的表名
+ * @param refKeyName 引用的表的字段名
  */
-export function reference(tableName: string, keyName: string) {
+export function reference<T extends Table>(keyName: string, refTableInstance: T, refKeyName: string) {
     return function (target: any, name: string) {
         let _reference: ReferenceInfo = {
-            refTableName: tableName,
-            refKeyName: keyName,
-            foreignKeyName: name
+            refTableInstance: refTableInstance,
+            refKeyName: refKeyName,
+            foreignKeyName: keyName,
+            propertyName: name
         }
         let _target = target.constructor;
         if (!_target["__references__"]) {

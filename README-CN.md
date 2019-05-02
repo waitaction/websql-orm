@@ -39,7 +39,7 @@ EnvConfig.enableDebugLog = true;
 # 定义表
 如何使用实体类定义一个表?
 ``` typescript
-import { table, column, ColumnType, Table } from 'websql-orm';
+import { database, column, ColumnType, Table } from 'websql-orm';
 
 @database("student_db")
 export class student extends Table {
@@ -56,11 +56,11 @@ export class student extends Table {
 
 ### 装饰器说明
 
-| 装饰器名   | 描述                                           | 示例                          |
-| ---------- | ---------------------------------------------- | ----------------------------- |
-| @database  | 定义表                                         | @database("student_db")       |
-| @column    | 定义列                                         | @column(ColumnType.STRING)    |
-| @reference | 定义外键引用                                     | @reference('class_info','id') |
+| 装饰器名   | 描述         | 示例                          |
+| ---------- | ------------ | ----------------------------- |
+| @database  | 定义表       | @database("student_db")       |
+| @column    | 定义列       | @column(ColumnType.STRING)    |
+| @reference | 定义外键引用 | @reference('class_info','id') |
 >定义**外键引用**详见高级部分
 
 ### 字段类型枚举
@@ -142,62 +142,230 @@ var delResult = await sqlite.delete(new student(),'291d853d-021b-4a66-9322-9d32e
 
 ### 示例
 
+#### 实体定义
 ``` typescript
-import { sqlite } from 'websql-orm';
-import { student } from './entity/student';
+/**
+ * 英雄
+ */
+@database('hero_db')
+export class hero extends Table {
+
+    /**主键id */
+    @column(ColumnType.STRING | ColumnType.PRIMARY) id: string;
+
+    /**姓名 */
+    @column(ColumnType.STRING) full_name: string;
+
+    /**年龄 */
+    @column(ColumnType.NUMBER) age: number;
+
+    /**是否是女生 */
+    @column(ColumnType.BOOLEAN) is_girl: boolean;
+
+    /**加入时间 */
+    @column(ColumnType.DATE) join_time: Date;
+
+    /**身体数据 */
+    @column(ColumnType.ANY) body_data: { stature: number, blood_type: BloodTypeEnum };
+
+    /**技能 */
+    @reference('id', new skill(), 'hero_id') skills: Array<skill>;
+
+}
+
+/**英雄技能 */
+@database('hero_db')
+export class skill extends Table {
+
+    /**主键id */
+    @column(ColumnType.STRING | ColumnType.PRIMARY) id: string;
+    
+    /**技能名称 */
+    @column(ColumnType.STRING) name: string;
+
+    /**技能描述 */
+    @column(ColumnType.STRING) descript: string;
+
+    /**伤害值 */
+    @column(ColumnType.NUMBER) harm: number;
+
+    /**英雄id */
+    @column(ColumnType.STRING) hero_id:string;
+}
+
+
+/**
+ * 血型 
+ * */
+export enum BloodTypeEnum {
+    A = 1,
+    B = 2,
+    AB = 3,
+    O = 4,
+    OTHER = 5
+}
+```
+
+#### 实现
+``` typescript
+import { skill } from './entities/skill';
+import { hero } from './entities/hero';
+import { sqlite } from "websql-orm";
+import { BloodTypeEnum } from './entities/BloodTypeEnum';
 
 export class Demo {
+    private lvbu_id = "da93faef-bfff-49c6-92b9-8807ec196bab";
+    private liubei_id = "ed609b25-166f-41de-9bbc-90eb8891b688";
+    private guanyu_id = "7289f8cb-496c-4057-b054-3bb4a3af1d6c";
     constructor() {
         var that = this;
         setTimeout(async () => {
-            var uid = that.uuid();
-            //实体实例
-            var data = new student();
-            data.id = uid;
-            data.user_name = "Tom";
-            //插入记录
-            var insertResult = await sqlite.insert(data);
-            if (insertResult) {
-                //使用sql语句查询刚刚插入的记录
-                var result = await sqlite.fromSqlFirst(new student(), "select * from student where id=?", [uid]);
-                console.log("使用sql语句查询刚刚插入的记录：")
-                console.log(result);
-                //修改user_name
-                result.user_name = "Sam";
-                //直接调用save()方法保存
-                var saveResult = await result.save();
-                if (saveResult) {
-                    //使用简易方法查询刚刚保存的记录
-                    var info = await sqlite.queryFirst(new student(), { id: uid });
-                    console.log("使用简易方法查询刚刚保存的记录：")
-                    console.log(info);
+            await that.addHero();
+            await that.queryHeros();
+            await that.queryHero(this.lvbu_id);
+            await that.updateHero(this.liubei_id);
+            await that.deleteHero(this.guanyu_id);
+        }, 0);
+    }
+
+    /**添加英难 */
+    async addHero() {
+        /**添加几位英雄
+         * 1.吕布
+         * 2.刘备
+         * 3.关羽
+         */
+        await this.deleteHeros();
+
+        let lvbu = new hero();
+        lvbu.id = this.lvbu_id;
+        lvbu.age = 32;
+        lvbu.full_name = "吕布";
+        lvbu.is_girl = false;
+        lvbu.join_time = new Date("2000/01/01");
+        lvbu.body_data = { stature: 185, blood_type: BloodTypeEnum.A };
+
+        let liubei = new hero();
+        liubei.id = this.liubei_id;
+        liubei.age = 31;
+        liubei.full_name = "刘备";
+        liubei.is_girl = false;
+        liubei.join_time = new Date("2001/02/01");
+        liubei.body_data = { stature: 178, blood_type: BloodTypeEnum.B };
+
+        let guanyu = new hero();
+        guanyu.id = this.guanyu_id;
+        guanyu.age = 30;
+        guanyu.full_name = "关羽";
+        guanyu.is_girl = false;
+        guanyu.join_time = new Date("2001/02/01");
+        guanyu.body_data = { stature: 180, blood_type: BloodTypeEnum.AB };
+
+        await sqlite.save(lvbu);
+        await sqlite.save(liubei);
+        await sqlite.save(guanyu);
+
+        //添加技能
+        await this.addSkills();
+    }
+
+    /**添加技能 */
+    async addSkills() {
+        //给吕布添加技能
+        let lvbu_skill = new skill();
+        lvbu_skill.id = this.uuid();
+        lvbu_skill.name = "方天画斩";
+        lvbu_skill.descript = "方天画斩是吕布第一伤害技能";
+        lvbu_skill.harm = 76;
+        lvbu_skill.hero_id = this.lvbu_id;
+
+        //给刘备添加技能
+        let liubei_skill = new skill();
+        liubei_skill.id = this.uuid();
+        liubei_skill.name = "以德服人";
+        liubei_skill.descript = "刘备清除身上的控制效果，并获得护盾，护盾存在期间刘备免疫控制";
+        liubei_skill.harm = 50;
+        liubei_skill.hero_id = this.liubei_id;
+
+        //给关羽添加技能
+        let guanyu_skill = new skill();
+        guanyu_skill.id = this.uuid();
+        guanyu_skill.name = "青龙偃月";
+        guanyu_skill.descript = "关羽这个英雄要持续不断的跑才能发挥本身的威力";
+        guanyu_skill.harm = 70;
+        guanyu_skill.hero_id = this.guanyu_id;
+
+        let result = await sqlite.insert([lvbu_skill, liubei_skill, guanyu_skill]);
+        if (result > 0) {
+            console.log("添加技能成功");
+        } else {
+            console.log("添加技能失败")
+        }
+
+
+    }
+
+    /**删除英雄 */
+    async deleteHero(id: string) {
+        let delResult = await sqlite.delete(new hero(), id);
+        if (!delResult) {
+            console.warn(`删除英雄${id}失败`);
+        } else {
+            console.log(`删除英雄${id}成功`);
+        }
+    }
+    /**删除所有英雄 */
+    async deleteHeros() {
+        var success = true;
+        var heros = await sqlite.fromSql(new hero(), "select * from hero", []);
+        if (heros != null && heros.length > 0) {
+            for (let index = 0; index < heros.length; index++) {
+                const element = heros[index];
+                let delResult = await sqlite.delete(new hero(), element.id);
+                if (!delResult) {
+                    success = false;
                 }
             }
+        }
+        if (!success) {
+            console.warn("删除所有英雄失败");
+        } else {
+            console.log("删除所有英雄成功");
+        }
 
-            //演示一次性插入多条记录
-            var students = new Array<student>();
-            
-            var stu1 = new student();
-            stu1.id = that.uuid();
-            stu1.user_name = "David";
+    }
+    /**修改英雄 */
+    async updateHero(id) {
+        var _hero = await sqlite.queryFirst(new hero(), { id: id });
+        _hero.join_time = new Date();
+        await _hero.save();
+        console.log("修改英雄");
+    }
 
-            var stu2 = new student();
-            stu2.id = that.uuid();
-            stu2.user_name = "David";
+    /**查询所有英雄 */
+    async queryHeros() {
+        var heros = await sqlite.fromSql(new hero(), "select * from hero", []);
+        console.log("查询所有英雄:");
+        console.log(heros);
+    }
 
-            students.push(...[stu1, stu2]);
+    /**查询指定的项雄 */
+    async queryHero(id: string) {
+        var hero_ = await sqlite.fromSql(new hero(), "select * from hero where id = ?", [id]);
+        console.log("查询英雄:");
+        console.log(hero_);
 
-            //插入多条记录
-            var insertsResult = await sqlite.insert(students);
+        var _hero = await sqlite.query(new hero(), { id: id });
+        console.log("查询英雄:");
+        console.log(_hero);
 
-            if (insertsResult) {
-                //查询返回多条记录
-                var stus = await sqlite.query(new student(), { user_name: "David" });
-                console.log("使用简易方法查询查询返回多条记录：");
-                console.log(stus);
-            }
-            
-        }, 0);
+        var __hero = await sqlite.queryFirst(new hero(), { id: id });
+        console.log("查询英雄:");
+        console.log(__hero);
+
+        var ___hero = await sqlite.fromSqlFirst(new hero(), "select * from hero where id = ?", [id]);
+        console.log("查询英雄:");
+        console.log(___hero);
     }
 
     /**
@@ -209,13 +377,14 @@ export class Demo {
         for (let i = 0; i < 36; i++) {
             s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
         }
-        s[14] = "4";  
-        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  
+        s[14] = "4";
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
         s[8] = s[13] = s[18] = s[23] = "-";
         let uuid = s.join("");
         return uuid;
     }
 }
+new Demo();
 
 ```
 
@@ -223,37 +392,22 @@ export class Demo {
 
 ### 定义引用
 如何定义外键引用？
+
 ``` typescript
-import { table, column, ColumnType, Table } from 'websql-orm';
+@database('hero_db')
+export class hero extends Table {
 
-/*班级信息表*/
-@database("student_db")
-export class class_info extends Table {
-    @column(ColumnType.PRIMARY | ColumnType.STRING)
-    id: string;
-    @column(ColumnType.STRING)
-    name: string;
-}
+    /**主键id */
+    @column(ColumnType.STRING | ColumnType.PRIMARY) id: string;
 
-/*学生信息表*/
-@database("student_db")
-export class student extends Table {
+    /**姓名 */
+    @column(ColumnType.STRING) full_name: string;
 
-    @column(ColumnType.STRING | ColumnType.PRIMARY)
-    id: string;
+    /* ... 省略其它字段定义 ... */
 
-    @column(ColumnType.STRING)
-    user_name: string;
-    
-    /*定义外键，引用班级信息表*/
-    @reference("class_info", "id")
-    class_id:string;
+    /**技能 */
+    @reference('id', new skill(), 'hero_id') skills: Array<skill>;
+
 }
 ```
 
-查询外键引用的外表数据
-``` typescript
-    var stu = await sqlite.fromSqlFirst(new student(), "select * from student where id=?", [uid]);
-    var refData = await stu.getRefData(new class_info());
-    console.log(refData);
-```

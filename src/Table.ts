@@ -43,33 +43,7 @@ export abstract class Table {
         return result > 0;
     }
 
-    /**
-     * 获取引用的表记录 
-     * */
-    async getRefData<T extends Table>(tableInstance: T): Promise<Array<T> | Array<{ name: string, data: Array<T> }>> {
-        var result = [];
-        var context = new DbContext<T>(<any>tableInstance.constructor);
-        var refs = this.__refsDef.filter(m => m.refTableName == tableInstance.__tableName);
-
-        if (refs != null && refs.length > 1) {
-            for (let index = 0; index < refs.length; index++) {
-                const element = refs[index];
-                let obj = {};
-                obj[element.refKeyName] = this[element.foreignKeyName];
-                let list = await context.query(obj);
-                result.push({ name: element.foreignKeyName, data: list });
-            }
-        } else if (refs != null && refs.length == 1) {
-            for (let index = 0; index < refs.length; index++) {
-                const element = refs[index];
-                let obj = {};
-                obj[element.refKeyName] = this[element.foreignKeyName];
-                let list = await context.query(obj);
-                result.push(...list);
-            }
-        }
-        return result;
-    }
+    
 
 
     /**
