@@ -21,7 +21,20 @@
 >提示：不要安装2.1.0之前的版本，2.1.0之前的版本是调试阶段的版本，无法使用
 
 `cordova plugin add cordova-sqlite-storage`
->若在 cordova项目中，则需要安装cordova插件兼容iOS
+>若在 cordova项目中，则需要安装cordova插件
+
+``` typescript
+import { EnvConfig } from 'websql-orm';
+
+EnvConfig.useCordovaSqliteStorage = true;
+```
+
+# 调试日志
+``` typescript
+import { EnvConfig } from 'websql-orm';
+
+EnvConfig.enableDebugLog = true;
+```
 
 # 定义表
 如何使用实体类定义一个表?

@@ -21,8 +21,19 @@
 >Tip: do not install a version prior to 2.1.0. The version prior to 2.1.0 is the debug version and cannot be used.
 
 `cordova plugin add cordova-sqlite-storage`
->Tip: In the cordova project, you need to install the cordova plugin that is compatible with iOS.
+>Tip: In the cordova project, you need to install the cordova plugin.
 
+``` typescript
+import { EnvConfig } from 'websql-orm';
+
+EnvConfig.useCordovaSqliteStorage = true;
+```
+# Debug log
+``` typescript
+import { EnvConfig } from 'websql-orm';
+
+EnvConfig.enableDebugLog = true;
+```
 # Define table
 How do I define a table using an entity class?
 ``` typescript

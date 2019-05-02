@@ -1,8 +1,9 @@
-import { DebugLog } from './DebugLog';
+import { EnvConfig } from './EnvConfig';
 import { Table } from "./Table";
 import { ColumnInfo } from "./ColumnInfo";
 import { GenerateSql } from "./GenerateSql";
 import { ColumnType } from "./ColumnType";
+
 
 export class DbContext<T extends Table>{
     private db: Database;
@@ -16,7 +17,13 @@ export class DbContext<T extends Table>{
         this.__tableName = this.objClass["__table_name__"];
         this.dbName = this.objClass["__db_name__"];
         this.__columnsDef = this.objClass["__columns__"];
-        this.db = window.openDatabase(this.dbName, '1.0.0', '', 1024 * 1024 * 10);
+
+        if (EnvConfig.useCordovaSqliteStorage) {
+            this.db = window['sqlitePlugin'].openDatabase({ name: this.dbName, location: 'default' });
+        } else {
+            this.db = window.openDatabase(this.dbName, '1.0.0', '', 1024 * 1024 * 10);
+        }
+
     }
 
 
@@ -27,13 +34,17 @@ export class DbContext<T extends Table>{
     async  fromSql(sql: string, value: Array<any>): Promise<Array<T>> {
         let that = this;
         await this.init();
+        EnvConfig.debug(`fromSql:`);
+        EnvConfig.debug(sql);
+        EnvConfig.debug(value);
         let promise = new Promise<Array<T>>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, value, (b, result) => {
                     var datas: Array<T> = [];
+                    EnvConfig.debug(result);
                     if (result.rows != null && result.rows.length > 0) {
                         for (let index = 0; index < result.rows.length; index++) {
-                            const element = result.rows[index];
+                            let element = result.rows.item(index);
                             datas.push(that.convertToMetadata(element));
                         }
                     }
@@ -87,7 +98,7 @@ export class DbContext<T extends Table>{
         let promise = new Promise<boolean>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, [primaryValue], (t: SQLTransaction, result: SQLResultSet) => {
-                    DebugLog.debug(`delete result: ${result.rowsAffected}`);
+                    EnvConfig.debug(`delete result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected > 0);
                 }, (t, info) => {
                     resolve(false);
@@ -128,7 +139,7 @@ export class DbContext<T extends Table>{
                         console.error(error);
                     }
                 }
-                DebugLog.debug(`insert result: ${rowsAffected}`);
+                EnvConfig.debug(`insert result: ${rowsAffected}`);
                 resolve(rowsAffected);
                 return;
             }
@@ -136,7 +147,7 @@ export class DbContext<T extends Table>{
             let sqlResult = that.gSql.gInsertSql(that.__tableName, that.objClass["__columns__"], value);
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
-                    DebugLog.debug(`insert result: ${result.rowsAffected}`);
+                    EnvConfig.debug(`insert result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
                 }, function (t, info) {
                     that.fail(t, info);
@@ -144,7 +155,7 @@ export class DbContext<T extends Table>{
                     return true;
                 });
             });
-            
+
 
         });
         return promise;
@@ -160,7 +171,7 @@ export class DbContext<T extends Table>{
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sqlResult[0], sqlResult[1], (t: SQLTransaction, result: SQLResultSet) => {
-                    DebugLog.debug(`update result: ${result.rowsAffected}`);
+                    EnvConfig.debug(`update result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
                 }, function (t, info) {
                     that.fail(t, info);
@@ -180,7 +191,7 @@ export class DbContext<T extends Table>{
         let promise = new Promise<number>(resolve => {
             that.db.transaction(function (t) {
                 t.executeSql(sql, value, (b, result) => {
-                    DebugLog.debug(`execSql result: ${result.rowsAffected}`);
+                    EnvConfig.debug(`execSql result: ${result.rowsAffected}`);
                     resolve(result.rowsAffected);
                 }, that.fail);
             });
@@ -189,7 +200,7 @@ export class DbContext<T extends Table>{
     }
 
     fail(transaction: SQLTransaction, error: SQLError): boolean {
-        DebugLog.debug(error);
+        EnvConfig.debug(error);
         console.error(error.message);
         return true;
     }
@@ -236,15 +247,15 @@ export class DbContext<T extends Table>{
                 result[key] = colValue;
             }
         }
-        DebugLog.debug("convertToMetadata:");
-        DebugLog.debug(result);
+        EnvConfig.debug("convertToMetadata:");
+        EnvConfig.debug(result);
         return result;
     }
     /**从表取到的数据转换成 @column 定义的类型 */
     public convertToColType(val: any, colInfo: ColumnInfo): any {
-        DebugLog.debug(`convertToColType:`);
-        DebugLog.debug(val);
-        DebugLog.debug(colInfo);
+        EnvConfig.debug(`convertToColType:`);
+        EnvConfig.debug(val);
+        EnvConfig.debug(colInfo);
         try {
             //数值类型
             if ((colInfo.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
