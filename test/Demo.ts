@@ -157,6 +157,15 @@ export class Demo {
         var ___hero = await sqlite.fromSqlFirst(new hero(), "select * from hero where id = ?", [id]);
         console.log("查询英雄:");
         console.log(___hero);
+
+        /**测试引用的bug */
+        var _skill = new skill();
+        _skill.id = this.uuid();
+        _skill.harm = 10;
+        _skill.hero_id = ___hero.id;
+        _skill.name = "fdsa"
+        ___hero.skills.push(_skill);
+        sqlite.save(___hero);
     }
 
     /**

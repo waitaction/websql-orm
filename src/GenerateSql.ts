@@ -106,7 +106,12 @@ export class GenerateSql {
                     if (key == primaryKeyName) {
                         continue;
                     }
-                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__tableName" || key == "__diff__" || key == "__refsDef") {
+                    if (key == "__columnsDef" || key == "__primaryColDef" || key == "__tableName" || key == "__diff__" || key == "__refsDef") {
+                        continue;
+                    }
+                    //如果该属性不未定义列，则忽略
+                    if (diffValue != null && diffValue.__columnsDef != null
+                        && diffValue.__columnsDef.find(m => m.name == key) == null) {
                         continue;
                     }
                     const element = diffValue[key];
