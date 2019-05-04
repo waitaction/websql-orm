@@ -43,7 +43,7 @@ export class DbContext<T extends Table>{
         EnvConfig.debug(value);
         let promise = new Promise<Array<T>>(resolve => {
             that.db.transaction(function (t) {
-                t.executeSql(sql, value,async (b, result) => {
+                t.executeSql(sql, value, async (b, result) => {
                     var datas: Array<T> = [];
                     EnvConfig.debug(result);
                     if (result.rows != null && result.rows.length > 0) {
@@ -59,12 +59,17 @@ export class DbContext<T extends Table>{
                             for (const key in v) {
                                 if (v.hasOwnProperty(key)) {
                                     const val = v[key];
-                                    let refData = that.__referencesDef.find(m => m.foreignKeyName == key);
-                                    if (refData != null) {
-                                        var obj = {};
-                                        obj[refData.refKeyName] = val;
-                                        let context = new DbContext<T>(<any>refData.refTableInstance.constructor);        
-                                        v[refData.propertyName] = await context.query(obj);                              
+                                    let refDatas = that.__referencesDef.filter(m => m.foreignKeyName == key);
+                                    if (refDatas != null && refDatas.length > 0) {
+                                        for (let index = 0; index < refDatas.length; index++) {
+                                            let refData = refDatas[index];
+                                            if (refData != null) {
+                                                let obj = {};
+                                                obj[refData.refKeyName] = val;
+                                                let context = new DbContext<T>(<any>refData.refTableInstance.constructor);
+                                                v[refData.propertyName] = await context.query(obj);
+                                            }
+                                        }
                                     }
                                 }
                             }
