@@ -54,13 +54,14 @@ export function database(dbName: string) {
  * @param refTableName 引用的表名
  * @param refKeyName 引用的表的字段名
  */
-export function reference<T extends Table>(keyName: string, refTableInstance: T, refKeyName: string) {
+export function reference<T extends Table>(keyName: string, refTableInstance: T, refKeyName: string, filter: (m: T) => void = null) {
     return function (target: any, name: string) {
         let _reference: ReferenceInfo = {
             refTableInstance: refTableInstance,
             refKeyName: refKeyName,
             foreignKeyName: keyName,
-            propertyName: name
+            propertyName: name,
+            filter:filter
         }
         let _target = target.constructor;
         if (!_target["__references__"]) {

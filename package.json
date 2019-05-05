@@ -1,6 +1,6 @@
 {
   "name": "websql-orm",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "websql-orm for typescript platform and angular cordova platform.",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/waitaction/websql-orm#readme",
   "keywords": [
+    "websql-orm",
     "websql",
     "orm",
     "sqlite",

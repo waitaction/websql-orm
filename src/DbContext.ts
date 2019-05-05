@@ -67,7 +67,12 @@ export class DbContext<T extends Table>{
                                                 let obj = {};
                                                 obj[refData.refKeyName] = val;
                                                 let context = new DbContext<T>(<any>refData.refTableInstance.constructor);
-                                                v[refData.propertyName] = await context.query(obj);
+                                                let refList = await context.query(obj);
+                                                if (refData.filter != null) {
+                                                    v[refData.propertyName] = refList.filter(refData.filter);
+                                                } else {
+                                                    v[refData.propertyName] = refList;
+                                                }
                                             }
                                         }
                                     }

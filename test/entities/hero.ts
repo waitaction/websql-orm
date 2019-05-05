@@ -29,6 +29,6 @@ export class hero extends Table {
     @column(ColumnType.ANY) body_data: { stature: number, blood_type: BloodTypeEnum };
 
     /**技能 */
-    @reference('id', new skill(), 'hero_id') skills: Array<skill>;
+    @reference('id', new skill(), 'hero_id', (m) => m.name.indexOf('德') > 0) skills: Array<skill>;
 
 }

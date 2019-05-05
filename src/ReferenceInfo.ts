@@ -9,7 +9,9 @@ export class ReferenceInfo {
     /**引用的列名 */
     refKeyName: string;
     /**外键名 */
-    foreignKeyName:string;
+    foreignKeyName: string;
     /**字段名 */
-    propertyName:string;
+    propertyName: string;
+    /**过滤器 */
+    filter: (m) => void;
 }
