@@ -4,8 +4,6 @@ import { ColumnInfo } from "./ColumnInfo";
 import { GenerateSql } from "./GenerateSql";
 import { ColumnType } from "./ColumnType";
 import { ReferenceInfo } from './ReferenceInfo';
-import { sqlite } from './sqlite';
-
 
 export class DbContext<T extends Table>{
     private db: Database;
@@ -14,6 +12,7 @@ export class DbContext<T extends Table>{
     private __columnsDef: Array<ColumnInfo>;
     private __referencesDef: Array<ReferenceInfo>;
     private gSql: GenerateSql;
+    public isTrace: boolean;
     constructor(
         public objClass: { new(): T }) {
         this.gSql = new GenerateSql();
@@ -21,7 +20,7 @@ export class DbContext<T extends Table>{
         this.dbName = this.objClass["__db_name__"];
         this.__columnsDef = this.objClass["__columns__"];
         this.__referencesDef = this.objClass["__references__"];
-
+        this.isTrace = true;
         if (EnvConfig.useCordovaSqliteStorage) {
             this.db = window['sqlitePlugin'].openDatabase({ name: this.dbName, location: 'default' });
         } else {
@@ -53,7 +52,7 @@ export class DbContext<T extends Table>{
                         }
                     }
                     //可能需要取引用的表的记录
-                    if (that.__referencesDef != null && that.__referencesDef.length > 0 && datas != null && datas.length > 0) {
+                    if (that.isTrace && that.__referencesDef != null && that.__referencesDef.length > 0 && datas != null && datas.length > 0) {
                         for (let index = 0; index < datas.length; index++) {
                             const v = datas[index];
                             for (const key in v) {
@@ -361,23 +360,4 @@ export class DbContext<T extends Table>{
 
     }
 
-
-
-    /**
-     * 获取引用的表记录 
-     * */
-    // async getRefData<T extends Table>(refTableInstance: T): Promise<Array<T>> {
-    //     var result = [];
-    //     var context = new DbContext<T>(<any>refTableInstance.constructor);
-    //     tableInstance.__refsDef.filter(m=>m)
-    //     var refs = tableInstance.__refsDef.filter(m => m.refTableName == refTableInstance.__tableName);
-    //     for (let index = 0; index < refs.length; index++) {
-    //         const element = refs[index];
-    //         let obj = {};
-    //         obj[element.refKeyName] = this[element.foreignKeyName];
-    //         let list = await context.query(obj);
-    //         result.push(...list);
-    //     }
-    //     return result;
-    // }
 }

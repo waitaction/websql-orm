@@ -13,64 +13,21 @@ export class sqlite {
      * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
      * @param value sql参数值,例如 ['Tom','Girl']
      */
-    static async fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<Array<T>> {
+    static async fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>, isTrace: boolean = true): Promise<Array<T>> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
+        context.isTrace = isTrace;
         return context.fromSql(sql, value);
     }
-    /**
-     * 使用sql语句查询数据，返回动态对像
-     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
-     * @param value sql参数值,例如 ['Tom','Girl']
-     */
-    static async queryBySql(dbName: string, sql: string, value: Array<any>): Promise<Array<any>> {
-        let promise = new Promise<Array<any>>(resolve => {
-            let db: Database;
-            if (EnvConfig.useCordovaSqliteStorage) {
-                db = window['sqlitePlugin'].openDatabase({ name: dbName, location: 'default' });
-            } else {
-                db = window.openDatabase(dbName, '1.0.0', '', 1024 * 1024 * 10);
-            }
-            db.transaction(function (t) {
-                t.executeSql(sql, value, async (b, result) => {
-                    var datas: Array<any> = [];
-                    EnvConfig.debug(result);
-                    if (result.rows != null && result.rows.length > 0) {
-                        for (let index = 0; index < result.rows.length; index++) {
-                            let element = result.rows.item(index);
-                            datas.push(element);
-                        }
-                    }
-                    resolve(datas);
-                }, (transaction: SQLTransaction, error: SQLError): boolean => {
-                    EnvConfig.debug(error);
-                    console.error(error.message);
-                    return true;
-                });
-            });
-        });
-        return promise;
-    }
-    /**
-     * 使用sql语句查询出首条数据，返回动态对像
-     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
-     * @param value sql参数值,例如 ['Tom','Girl']
-     */
-    static async queryFirstBySql(dbName: string, sql: string, value: Array<any>): Promise<any> {
-       let result=await this.queryBySql(dbName,sql,value);
-       if (result!=null && result.length>0){
-           return result[0];
-       }else{
-           return null;
-       }
-    }
+
     /**
      * 返回查询出的首条数据
      * @param tableInstance 实体实列,例如 new student()
      * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
      * @param value sql参数值,例如 ['Tom','Girl']
      */
-    static async fromSqlFirst<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<T> {
+    static async fromSqlFirst<T extends Table>(tableInstance: T, sql: string, value: Array<any>, isTrace: boolean = true): Promise<T> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
+        context.isTrace = isTrace;
         var result = await context.fromSql(sql, value);
         if (result != null && result.length > 0) {
             return result[0];
@@ -86,6 +43,7 @@ export class sqlite {
      */
     static async exist<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
+
         return context.exist(primaryValue);
     }
 
@@ -143,8 +101,9 @@ export class sqlite {
      * @param tableInstance 实体实列,例如 new student()
      * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
      */
-    static async query<T extends Table>(tableInstance: T, param: any): Promise<Array<T>> {
+    static async query<T extends Table>(tableInstance: T, param: any, isTrace: boolean = true): Promise<Array<T>> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
+        context.isTrace = isTrace;
         return context.query(param);
     }
 
@@ -153,8 +112,9 @@ export class sqlite {
      * @param tableInstance 实体实列,例如 new student()
      * @param param json对像参数，例如 { id:'e453c1e4-b7fc-4775-a2b4-26a0d834e83d' , user_name:'Tom' } , 类似于 where id='e453c1e4-b7fc-4775-a2b4-26a0d834e83d' and user_name='Tome'
      */
-    static async queryFirst<T extends Table>(tableInstance: T, param: any): Promise<T> {
+    static async queryFirst<T extends Table>(tableInstance: T, param: any, isTrace: boolean = true): Promise<T> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
+        context.isTrace = isTrace;
         var result = await context.query(param);
         if (result != null) {
             return result[0]
@@ -170,6 +130,55 @@ export class sqlite {
     static async save<T extends Table>(value: T): Promise<number> {
         var context = new DbContext<T>(<any>value.constructor);
         return context.save(value);
+    }
+
+
+
+    /**
+    * 使用sql语句查询数据，返回动态对像
+    * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+    * @param value sql参数值,例如 ['Tom','Girl']
+    */
+    static async fromSqlByJs(dbName: string, sql: string, value: Array<any>): Promise<Array<any>> {
+        let promise = new Promise<Array<any>>(resolve => {
+            let db: Database;
+            if (EnvConfig.useCordovaSqliteStorage) {
+                db = window['sqlitePlugin'].openDatabase({ name: dbName, location: 'default' });
+            } else {
+                db = window.openDatabase(dbName, '1.0.0', '', 1024 * 1024 * 10);
+            }
+            db.transaction(function (t) {
+                t.executeSql(sql, value, async (b, result) => {
+                    var datas: Array<any> = [];
+                    EnvConfig.debug(result);
+                    if (result.rows != null && result.rows.length > 0) {
+                        for (let index = 0; index < result.rows.length; index++) {
+                            let element = result.rows.item(index);
+                            datas.push(element);
+                        }
+                    }
+                    resolve(datas);
+                }, (transaction: SQLTransaction, error: SQLError): boolean => {
+                    EnvConfig.debug(error);
+                    console.error(error.message);
+                    return true;
+                });
+            });
+        });
+        return promise;
+    }
+    /**
+     * 使用sql语句查询出首条数据，返回动态对像
+     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+     * @param value sql参数值,例如 ['Tom','Girl']
+     */
+    static async fromSqlFirstByJs(dbName: string, sql: string, value: Array<any>): Promise<any> {
+        let result = await this.fromSqlByJs(dbName, sql, value);
+        if (result != null && result.length > 0) {
+            return result[0];
+        } else {
+            return null;
+        }
     }
 }
 
