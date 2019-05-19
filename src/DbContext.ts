@@ -241,7 +241,7 @@ export class DbContext<T extends Table>{
     /**
      * 初始 
      * */
-    private async init() {
+    public async init() {
         await this.createTable(this.__columnsDef);
     }
 

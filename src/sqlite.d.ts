@@ -64,6 +64,10 @@ export declare class sqlite {
      */
     static save<T extends Table>(value: T): Promise<number>;
     /**
+     * 初始化实体
+     */
+    static init<T extends Table>(tableInstance: T): Promise<void>;
+    /**
     * 使用sql语句查询数据，返回动态对像
     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
     * @param value sql参数值,例如 ['Tom','Girl']

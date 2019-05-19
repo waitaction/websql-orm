@@ -133,6 +133,13 @@ export class sqlite {
     }
 
 
+    /**
+     * 初始化实体
+     */
+    static async init<T extends Table>(tableInstance: T): Promise<void> {
+        var context = new DbContext<T>(<any>tableInstance.constructor);
+        return context.init();
+    }
 
     /**
     * 使用sql语句查询数据，返回动态对像
@@ -180,6 +187,8 @@ export class sqlite {
             return null;
         }
     }
+
+
 }
 
 
