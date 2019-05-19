@@ -140,6 +140,16 @@ var result = await sqlite.execSql(new student(),
 var delResult = await sqlite.delete(new student(),'291d853d-021b-4a66-9322-9d32eb27eb27');
 ```
 
+**sqlite.queryBySql** `查询记录(不追踪实体)`
+``` typescript
+var data:any = await sqlite.queryBySql(dbName,'select * from student where user_name=? ',['Tom']);
+```
+
+**sqlite.queryFirstBySql** `查询首条记录(不追踪实体)`
+``` typescript
+var data:any = await sqlite.queryBySql(dbName,'select * from student where user_name=? ',['Tom']);
+```
+
 ### 示例
 
 #### 实体定义

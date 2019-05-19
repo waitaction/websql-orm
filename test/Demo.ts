@@ -146,6 +146,14 @@ export class Demo {
         console.log("查询英雄:");
         console.log(hero_);
 
+        var hero_queryBySql = await sqlite.queryBySql("hero_db", "select * from hero where id = ?", [id]);
+        console.log("queryBySql:");
+        console.log(hero_queryBySql);
+
+        var hero_queryFirstBySql = await sqlite.queryFirstBySql("hero_db", "select * from hero where id = ?", [id]);
+        console.log("queryFirstBySql");
+        console.log(hero_queryFirstBySql);
+
         var _hero = await sqlite.query(new hero(), { id: id });
         console.log("查询英雄:");
         console.log(_hero);

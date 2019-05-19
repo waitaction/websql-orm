@@ -11,6 +11,18 @@ export declare class sqlite {
      */
     static fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<Array<T>>;
     /**
+     * 使用sql语句查询数据，返回动态对像
+     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+     * @param value sql参数值,例如 ['Tom','Girl']
+     */
+    static queryBySql(dbName: string, sql: string, value: Array<any>): Promise<Array<any>>;
+    /**
+     * 使用sql语句查询出首条数据，返回动态对像
+     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+     * @param value sql参数值,例如 ['Tom','Girl']
+     */
+    static queryFirstBySql(dbName: string, sql: string, value: Array<any>): Promise<any>;
+    /**
      * 返回查询出的首条数据
      * @param tableInstance 实体实列,例如 new student()
      * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'

@@ -1,6 +1,7 @@
 ﻿/// <reference types="@types/websql" />
 import { Table } from "./Table";
 import { DbContext } from "./DbContext";
+import { EnvConfig } from "./EnvConfig";
 
 /**
  * sqlite orm
@@ -15,6 +16,52 @@ export class sqlite {
     static async fromSql<T extends Table>(tableInstance: T, sql: string, value: Array<any>): Promise<Array<T>> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return context.fromSql(sql, value);
+    }
+    /**
+     * 使用sql语句查询数据，返回动态对像
+     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+     * @param value sql参数值,例如 ['Tom','Girl']
+     */
+    static async queryBySql(dbName: string, sql: string, value: Array<any>): Promise<Array<any>> {
+        let promise = new Promise<Array<any>>(resolve => {
+            let db: Database;
+            if (EnvConfig.useCordovaSqliteStorage) {
+                db = window['sqlitePlugin'].openDatabase({ name: dbName, location: 'default' });
+            } else {
+                db = window.openDatabase(dbName, '1.0.0', '', 1024 * 1024 * 10);
+            }
+            db.transaction(function (t) {
+                t.executeSql(sql, value, async (b, result) => {
+                    var datas: Array<any> = [];
+                    EnvConfig.debug(result);
+                    if (result.rows != null && result.rows.length > 0) {
+                        for (let index = 0; index < result.rows.length; index++) {
+                            let element = result.rows.item(index);
+                            datas.push(element);
+                        }
+                    }
+                    resolve(datas);
+                }, (transaction: SQLTransaction, error: SQLError): boolean => {
+                    EnvConfig.debug(error);
+                    console.error(error.message);
+                    return true;
+                });
+            });
+        });
+        return promise;
+    }
+    /**
+     * 使用sql语句查询出首条数据，返回动态对像
+     * @param sql sql语句,例如 'select * from student where user_name = ? and gender = ? ;'
+     * @param value sql参数值,例如 ['Tom','Girl']
+     */
+    static async queryFirstBySql(dbName: string, sql: string, value: Array<any>): Promise<any> {
+       let result=await this.queryBySql(dbName,sql,value);
+       if (result!=null && result.length>0){
+           return result[0];
+       }else{
+           return null;
+       }
     }
     /**
      * 返回查询出的首条数据
@@ -100,6 +147,7 @@ export class sqlite {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return context.query(param);
     }
+
     /**
      * 查询首条数据
      * @param tableInstance 实体实列,例如 new student()
