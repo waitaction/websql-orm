@@ -7,3 +7,4 @@ export * from './src/GenerateSql';
 export * from './src/Table';
 export * from './src/sqlite';
 export * from './src/EnvConfig';
+export * from './src/SqliteJs';

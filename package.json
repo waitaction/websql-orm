@@ -1,6 +1,6 @@
 {
   "name": "websql-orm",
-  "version": "2.4.2",
+  "version": "2.5.0",
   "description": "websql-orm for typescript platform and angular cordova platform.",
   "main": "index.js",
   "scripts": {

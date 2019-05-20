@@ -140,14 +140,14 @@ var result = await sqlite.execSql(new student(),
 var delResult = await sqlite.delete(new student(),'291d853d-021b-4a66-9322-9d32eb27eb27');
 ```
 
-**sqlite.queryBySql** `查询记录(不追踪实体)`
+**sqlite.fromSqlByJs** `查询记录(不追踪实体)`
 ``` typescript
-var data:any = await sqlite.queryBySql(dbName,'select * from student where user_name=? ',['Tom']);
+var data:any = await sqlite.fromSqlByJs(dbName,'select * from student where user_name=? ',['Tom']);
 ```
 
-**sqlite.queryFirstBySql** `查询首条记录(不追踪实体)`
+**sqlite.fromSqlFirstByJs** `查询首条记录(不追踪实体)`
 ``` typescript
-var data:any = await sqlite.queryBySql(dbName,'select * from student where user_name=? ',['Tom']);
+var data:any = await sqlite.fromSqlFirstByJs(dbName,'select * from student where user_name=? ',['Tom']);
 ```
 
 ### 示例
@@ -421,3 +421,29 @@ export class hero extends Table {
 }
 ```
 
+# 在`javascript`中使用websql-orm
+
+### 示例
+
+javascript由于没有装饰器，目前仅提供以下三个方法。
+
+``` js
+
+var sqliteJs= new SqliteJs('db_name');
+
+sqliteJs.fromSql("select * from hero where id = ?", [id]).then(function(result){
+    console.log(result);
+});
+
+sqliteJs.fromSqlFirst("select * from hero where id = ?", [id]).then(function(result){
+    console.log('成功');
+});
+
+sqliteJs.execSql("insert into hero (id,name) values (?,?)", [id,name]).then(function(result){
+    if (result>0){
+        console.log('成功');
+    }
+});
+
+
+```

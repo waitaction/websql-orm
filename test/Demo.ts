@@ -1,3 +1,4 @@
+import { SqliteJs } from './../src/SqliteJs';
 import { skill } from './entities/skill';
 import { hero } from './entities/hero';
 import { sqlite } from "../src/sqlite";
@@ -146,11 +147,12 @@ export class Demo {
         console.log("查询英雄:");
         console.log(hero_);
 
-        var hero_queryBySql = await sqlite.fromSqlByJs("hero_db", "select * from hero where id = ?", [id]);
+        let sqliteJs = new SqliteJs('hero_db');
+        var hero_queryBySql = await sqliteJs.fromSql("select * from hero where id = ?", [id]);
         console.log("fromSqlByJs:");
         console.log(hero_queryBySql);
 
-        var hero_queryFirstBySql = await sqlite.fromSqlFirstByJs("hero_db", "select * from hero where id = ?", [id]);
+        var hero_queryFirstBySql = await sqliteJs.fromSqlFirst("select * from hero where id = ?", [id]);
         console.log("fromSqlFirstByJs");
         console.log(hero_queryFirstBySql);
 
