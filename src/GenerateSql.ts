@@ -69,8 +69,7 @@ export class GenerateSql {
                 qs.push('?');
                 if (value[col.name] != null) {
                     if (value[col.name] instanceof Date) {
-                        //param.push(value[col.name].toJSON());
-                        param.push(value[col.name]);
+                        param.push(value[col.name].toISOString());
                     } else if (typeof (value[col.name]) == "object") {
                         param.push(JSON.stringify(value[col.name]));
                     }
@@ -118,8 +117,7 @@ export class GenerateSql {
                     cols.push('`' + key + '`');
                     if (element != null) {
                         if (element instanceof Date) {
-                            //param.push(element.toJSON());
-                            param.push(element);
+                            param.push(element.toISOString());
                         } else if (typeof (element) == "object") {
                             param.push(JSON.stringify(element));
                         }
