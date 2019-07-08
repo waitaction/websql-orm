@@ -1,13 +1,15 @@
-`websql-orm` 框架，支持 `typescript` `angular` `cordova` `chrome` 的sqlite数据库读写。
+
+`websql-orm` framework，support `typescript` `angular` `cordova` `chrome` sqlite database.
 
 [![npm](https://badgen.net/npm/v/websql-orm)](https://www.npmjs.com/package/websql-orm)
 [![install size](https://badgen.net/packagephobia/install/websql-orm)](https://packagephobia.now.sh/result?p=websql-orm)
 [![downloads](https://badgen.net/npm/dt/websql-orm)](https://www.npmjs.com/package/websql-orm)
 
-[英文文档](README.md)
-# 开始
+# [中文文档](README-EN.md)
 
-`websql-orm` 使用 `TypeScript` 语言编写，使用之前需在 `tsconfig.json` 添加装饰器配置项以启用装饰器特性.
+# Usage
+
+`websql-orm` use `TypeScript` language, needs to be in before using `tsconfig.json` add a decorator configuration items to enable the decorator features.
 
 ``` json
 {
@@ -16,28 +18,26 @@
     }
 }
 ```
-# 安装
+# Installation
 `npm install websql-orm@latest`
->提示：不要安装2.1.0之前的版本，2.1.0之前的版本是调试阶段的版本，无法使用
+>Tip: do not install a version prior to 2.1.0. The version prior to 2.1.0 is the debug version and cannot be used.
 
 `cordova plugin add cordova-sqlite-storage`
->若在 cordova项目中，则需要安装cordova插件
+>Tip: In the cordova project, you need to install the cordova plugin.
 
 ``` typescript
 import { EnvConfig } from 'websql-orm';
 
 EnvConfig.useCordovaSqliteStorage = true;
 ```
-
-# 调试日志
+# Debug log
 ``` typescript
 import { EnvConfig } from 'websql-orm';
 
 EnvConfig.enableDebugLog = true;
 ```
-
-# 定义表
-如何使用实体类定义一个表?
+# Define table
+How do I define a table using an entity class?
 ``` typescript
 import { database, column, ColumnType, Table } from 'websql-orm';
 
@@ -49,59 +49,59 @@ export class student extends Table {
     user_name: string;
 }
 ```
-> 1) 装饰器`@database` 定义student表，类名 student 是表名, `student_db` 是数据库名。  
-> 2) 装饰器 `@column` 定义列，`ColumnType.STRING` 表示该字段是文本类型  
-> 3) 每个表必须拥有一个主键字段，`ColumnType.PRIMARY` 表示该字段为主键字段  
-> 4) 每个实体类必须继承 `Table`
+> 1) Decorator `@database` definition student table, the name of the class student is the name of the table, `student_db` is the database name.
+> 2) Decorator `@column` definition column, `ColumnType.STRING` define text type.
+> 3) Each table must have a PRIMARY key field, `ColumnType.PRIMARY` define the PRIMARY key field.
+> 4) Each entity class must inherit `Table`.
 
-### 装饰器说明
+### Decorator description
 
-| 装饰器名   | 描述         | 示例                          |
-| ---------- | ------------ | ----------------------------- |
-| @database  | 定义表       | @database("student_db","table_name")       |
-| @column    | 定义列       | @column(ColumnType.STRING)    |
-| @reference | 定义外键引用 | @reference('class_info','id') |
->定义**外键引用**详见高级部分
+| Decorator name   | Description                              | Sample                          |
+| ---------- | ---------------------------------------------- | ----------------------------- |
+| @database  | Define table                                   | @database("student_db","table_name")       |
+| @column    | Define column                                  | @column(ColumnType.STRING)    |
+| @reference | Define foreign key references                  | @reference('class_info','id') |
+>Define **foreign key reference** see advanced section
 
-### 字段类型枚举
+### Field type enumeration
 
-表字段枚举值与TypeScript基本类型保持一致
+Table field enumeration values are consistent with TypeScript primitive types.
 
-| 字段类型枚举       | 描述     |
-| ------------------ | -------- |
-| ColumnType.PRIMARY | 主键     |
-| ColumnType.BOOLEAN | 布尔值   |
-| ColumnType.NUMBER  | 数值     |
-| ColumnType.STRING  | 字符串   |
-| ColumnType.ARRAY   | 数组     |
-| ColumnType.DATE    | 日期     |
-| ColumnType.ANY     | 任意类型 |
+| Field type enumeration  | Description         |
+| ------------------ | ------------------------ |
+| ColumnType.PRIMARY | Primary key              |
+| ColumnType.BOOLEAN | boolean                  |
+| ColumnType.NUMBER  | number                   |
+| ColumnType.STRING  | string                   |
+| ColumnType.ARRAY   | Array                    |
+| ColumnType.DATE    | Date                     |
+| ColumnType.ANY     | any                      |
 
-# 如何使用 
-> *`以上述定义的 student 表为例`*
+# How to use 
+> *Take the `student` table defined above as an example*
 
 
-### `websql-orm` 方法列表
+### `websql-orm` Methods list
 
-**sqlite.fromSql** `查询表记录，返回记录列表`
+**sqlite.fromSql** `Query the table record and return a list of records`
 ``` typescript
 var list = await sqlite.fromSql(new student(),
             'select * from student where user_name=? and id=? ',
             ['Tom','guid']);
 ```
-**sqlite.fromSqlFirst** `查询首条表记录，返回首条记录`
+**sqlite.fromSqlFirst** `Query the first table record and return the first record`
 ``` typescript
 var info = await sqlite.fromSqlFirst(new student(),
             'select * from student where user_name=? ',
             ['Tom']);
 ```
 
-**sqlite.exist** `查询记录是否存在，返回true或false`
+**sqlite.exist** `Querying for the existence of a record returns true or false`
 ``` typescript
 var result = await sqlite.exist('b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9');
 ```
 
-**sqlite.insert** `插入记录,返回受影响的行数`
+**sqlite.insert** `Inserts a record, returning the number of rows affected`
 ``` typescript
 var stu = new student();
 stu.id = uid;
@@ -109,33 +109,33 @@ stu.user_name = 'Tom';
 var result = await sqlite.insert(stu);
 ```
 
-**sqlite.update** `修改记录,返回受影响的行数`
+**sqlite.update** `Modify the record to return the number of rows affected`
 ``` typescript
 var info = await sqlite.fromSqlFirst(new student(),
             'select * from student where user_name=? ',
             ['Tom']);
 info.user_name = 'Sam'; 
-var result = await info.save(); //或者 var result = await sqlite.update(info)
+var result = await info.save(); // var result = await sqlite.update(info)
 ```
 
-**sqlite.query** `查询记录，返回记录列表`
+**sqlite.query** `Query records and return a list of records`
 ``` typescript
 var list = await sqlite.query({ user_name:'Tom'});
 ```
 
-**sqlite.queryFirst** `查询首条记录`
+**sqlite.queryFirst** `Query the first record`
 ``` typescript
 var info = await sqlite.queryFirst({ user_name:'Tom'});
 ```
 
-**sqlite.execSql** `执行sql语句，返回受影响行数`
+**sqlite.execSql** `Execute the SQL statement and return the number of affected rows`
 ``` typescript
 var result = await sqlite.execSql(new student(),
                 'insert into (id,user_name) values (?,?)',
                 ['b4ce6b51-0bd6-46ee-a5c7-d1d5a93bdee9','Tom']);
 ```
 
-**sqlite.delete** `删除记录`
+**sqlite.delete** `Delete records`
 ``` typescript
 var delResult = await sqlite.delete(new student(),'291d853d-021b-4a66-9322-9d32eb27eb27');
 ```
@@ -150,7 +150,7 @@ var data:any = await sqlite.fromSqlByJs(dbName,'select * from student where user
 var data:any = await sqlite.fromSqlFirstByJs(dbName,'select * from student where user_name=? ',['Tom']);
 ```
 
-### 示例
+### The sample
 
 #### 实体定义
 ``` typescript
@@ -398,10 +398,10 @@ new Demo();
 
 ```
 
-# 高级
+# Advanced
 
-### 定义引用
-如何定义外键引用？
+### Define the reference
+How do I define a foreign key reference?
 
 ``` typescript
 @database('hero_db','hero')
@@ -417,33 +417,8 @@ export class hero extends Table {
 
     /**技能 */
     @reference('id', new skill(), 'hero_id') skills: Array<skill>;
-
 }
 ```
 
-# 在`javascript`中使用websql-orm
-
-### 示例
-
-javascript由于没有装饰器，目前仅提供以下三个方法。
-
-``` js
-
-var sqliteJs= new SqliteJs('db_name');
-
-sqliteJs.fromSql("select * from hero where id = ?", [id]).then(function(result){
-    console.log(result);
-});
-
-sqliteJs.fromSqlFirst("select * from hero where id = ?", [id]).then(function(result){
-    console.log('成功');
-});
-
-sqliteJs.execSql("insert into hero (id,name) values (?,?)", [id,name]).then(function(result){
-    if (result>0){
-        console.log('成功');
-    }
-});
-
-
-```
+## License
+Copyright (c) 2019, Sam Chen. (ISC License)
