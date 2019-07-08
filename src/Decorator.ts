@@ -40,10 +40,10 @@ export function table(dbName: string = null) {
 /**
  * 用于定义表所在的数据库
  */
-export function database(dbName: string) {
+export function database(dbName: string, tableName: string) {
     return function (target: any) {
         target["__db_name__"] = dbName;
-        target["__table_name__"] = target.name;
+        target["__table_name__"] = tableName; //target.name;
     };
 }
 
@@ -61,7 +61,7 @@ export function reference<T extends Table>(keyName: string, refTableInstance: T,
             refKeyName: refKeyName,
             foreignKeyName: keyName,
             propertyName: name,
-            filter:filter
+            filter: filter
         }
         let _target = target.constructor;
         if (!_target["__references__"]) {

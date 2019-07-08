@@ -7,7 +7,7 @@ import { skill } from "./skill";
 /**
  * 英雄
  */
-@database('hero_db')
+@database('hero_db','hero')
 export class hero extends Table {
 
     /**主键id */

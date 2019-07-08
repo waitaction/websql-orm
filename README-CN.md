@@ -41,7 +41,7 @@ EnvConfig.enableDebugLog = true;
 ``` typescript
 import { database, column, ColumnType, Table } from 'websql-orm';
 
-@database("student_db")
+@database("student_db","student")
 export class student extends Table {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
     id: string;
@@ -58,7 +58,7 @@ export class student extends Table {
 
 | 装饰器名   | 描述         | 示例                          |
 | ---------- | ------------ | ----------------------------- |
-| @database  | 定义表       | @database("student_db")       |
+| @database  | 定义表       | @database("student_db","table_name")       |
 | @column    | 定义列       | @column(ColumnType.STRING)    |
 | @reference | 定义外键引用 | @reference('class_info','id') |
 >定义**外键引用**详见高级部分
@@ -157,7 +157,7 @@ var data:any = await sqlite.fromSqlFirstByJs(dbName,'select * from student where
 /**
  * 英雄
  */
-@database('hero_db')
+@database('hero_db','hero')
 export class hero extends Table {
 
     /**主键id */
@@ -184,7 +184,7 @@ export class hero extends Table {
 }
 
 /**英雄技能 */
-@database('hero_db')
+@database('hero_db','skill')
 export class skill extends Table {
 
     /**主键id */
@@ -404,7 +404,7 @@ new Demo();
 如何定义外键引用？
 
 ``` typescript
-@database('hero_db')
+@database('hero_db','hero')
 export class hero extends Table {
 
     /**主键id */

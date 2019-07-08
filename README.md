@@ -40,7 +40,7 @@ How do I define a table using an entity class?
 ``` typescript
 import { database, column, ColumnType, Table } from 'websql-orm';
 
-@database("student_db")
+@database("student_db","student")
 export class student extends Table {
     @column(ColumnType.STRING | ColumnType.PRIMARY)
     id: string;
@@ -57,7 +57,7 @@ export class student extends Table {
 
 | Decorator name   | Description                              | Sample                          |
 | ---------- | ---------------------------------------------- | ----------------------------- |
-| @database  | Define table                                   | @database("student_db")       |
+| @database  | Define table                                   | @database("student_db","table_name")       |
 | @column    | Define column                                  | @column(ColumnType.STRING)    |
 | @reference | Define foreign key references                  | @reference('class_info','id') |
 >Define **foreign key reference** see advanced section
@@ -156,7 +156,7 @@ var data:any = await sqlite.fromSqlFirstByJs(dbName,'select * from student where
 /**
  * 英雄
  */
-@database('hero_db')
+@database('hero_db','hero')
 export class hero extends Table {
 
     /**主键id */
@@ -183,7 +183,7 @@ export class hero extends Table {
 }
 
 /**英雄技能 */
-@database('hero_db')
+@database('hero_db','skill')
 export class skill extends Table {
 
     /**主键id */
@@ -403,7 +403,7 @@ new Demo();
 How do I define a foreign key reference?
 
 ``` typescript
-@database('hero_db')
+@database('hero_db','hero')
 export class hero extends Table {
 
     /**主键id */

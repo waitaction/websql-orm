@@ -2,7 +2,7 @@ import { column, reference, database } from "../../src/Decorator";
 import { Table } from "../../src/Table";
 import { ColumnType } from "../../src/ColumnType";
 /**英雄技能 */
-@database('hero_db')
+@database('hero_db','skill')
 export class skill extends Table {
 
     /**主键id */
