@@ -43,6 +43,15 @@ import { EnvConfig } from 'websql-orm';
 EnvConfig.enableDebugLog = true;
 ```
 
+## 其它配置
+
+``` typescript
+import { EnvConfig } from 'websql-orm';
+// 时间移除毫秒
+EnvConfig.dateFormatRemoveMillisecond = true;
+
+````
+
 ## 定义表
 
 如何使用实体类定义一个表?

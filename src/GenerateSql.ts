@@ -69,7 +69,11 @@ export class GenerateSql {
                 qs.push('?');
                 if (value[col.name] != null) {
                     if (value[col.name] instanceof Date) {
-                        param.push(value[col.name].toISOString());
+                        if (!EnvConfig.dateFormatRemoveMillisecond) {
+                            param.push(value[col.name].toISOString());
+                        } else {
+                            param.push(value[col.name].toISOString().replace(/\.\d\d\dZ/, ".000Z"));
+                        }
                     } else if (typeof (value[col.name]) == "object") {
                         param.push(JSON.stringify(value[col.name]));
                     }
@@ -117,7 +121,11 @@ export class GenerateSql {
                     cols.push('`' + key + '`');
                     if (element != null) {
                         if (element instanceof Date) {
-                            param.push(element.toISOString());
+                            if (!EnvConfig.dateFormatRemoveMillisecond) {
+                                param.push(element.toISOString());
+                            } else {
+                                param.push(element.toISOString().replace(/\.\d\d\dZ/, ".000Z"));
+                            }
                         } else if (typeof (element) == "object") {
                             param.push(JSON.stringify(element));
                         }

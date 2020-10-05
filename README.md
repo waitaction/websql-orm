@@ -42,6 +42,15 @@ import { EnvConfig } from 'websql-orm';
 EnvConfig.enableDebugLog = true;
 ```
 
+## Other Config
+
+``` typescript
+import { EnvConfig } from 'websql-orm';
+// 时间移除毫秒
+EnvConfig.dateFormatRemoveMillisecond = true;
+
+````
+
 ## Define table
 
 How do I define a table using an entity class?

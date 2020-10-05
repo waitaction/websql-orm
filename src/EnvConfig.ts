@@ -19,4 +19,6 @@ export class EnvConfig {
      *是否启用
      */
     static enableDebugLog: boolean;
+
+    static dateFormatRemoveMillisecond: boolean = false;
 }
