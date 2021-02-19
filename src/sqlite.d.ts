@@ -28,7 +28,7 @@ export declare class sqlite {
      * @param tableInstance 实体实列,例如 new student()
      * @param primaryValue 主键值
      */
-    static delete<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean>;
+    static delete<T extends Table>(tableInstance: T, primaryValue: string | any): Promise<boolean>;
     /**
      * 插入记录,返回受影响的行数
      * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...

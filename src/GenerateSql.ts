@@ -42,7 +42,12 @@ export class GenerateSql {
                     _type = "TEXT";
                 }
                 if ((element.type & ColumnType.PRIMARY) === ColumnType.PRIMARY) {
-                    _type += " PRIMARY KEY NOT NULL";
+                    //数值则设为自增
+                    if ((element.type & ColumnType.NUMBER) === ColumnType.NUMBER) {
+                        _type = " INTEGER PRIMARY KEY autoincrement";
+                    } else {
+                        _type += " PRIMARY KEY NOT NULL";
+                    }
                 }
                 colSql.push('`' + element.name + '`' + ' ' + _type);
             }

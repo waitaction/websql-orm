@@ -90,12 +90,15 @@ export class student extends Table {
 | 字段类型枚举       | 描述     |
 | ------------------ | -------- |
 | ColumnType.PRIMARY | 主键     |
+| ColumnType.STRING \| ColumnType.PRIMARY | 主键(字符串)     |
+| ColumnType.NUMBER \| ColumnType.PRIMARY | 主键(数值自增)     |
 | ColumnType.BOOLEAN | 布尔值   |
 | ColumnType.NUMBER  | 数值     |
 | ColumnType.STRING  | 字符串   |
 | ColumnType.ARRAY   | 数组     |
 | ColumnType.DATE    | 日期     |
 | ColumnType.ANY     | 任意类型 |
+
 
 ## 如何使用
 

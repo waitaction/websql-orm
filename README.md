@@ -89,6 +89,8 @@ Table field enumeration values are consistent with TypeScript primitive types.
 | Field type enumeration | Description |
 | ---------------------- | ----------- |
 | ColumnType.PRIMARY     | Primary key |
+| ColumnType.STRING \| ColumnType.PRIMARY | Primary key (string)     |
+| ColumnType.NUMBER \| ColumnType.PRIMARY | integer PRIMARY KEY autoincrement     |
 | ColumnType.BOOLEAN     | boolean     |
 | ColumnType.NUMBER      | number      |
 | ColumnType.STRING      | string      |

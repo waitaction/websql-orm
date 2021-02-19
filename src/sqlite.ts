@@ -52,7 +52,7 @@ export class sqlite {
      * @param tableInstance 实体实列,例如 new student()
      * @param primaryValue 主键值
      */
-    static async delete<T extends Table>(tableInstance: T, primaryValue: string): Promise<boolean> {
+    static async delete<T extends Table>(tableInstance: T, primaryValue: string | any): Promise<boolean> {
         var context = new DbContext<T>(<any>tableInstance.constructor);
         return context.delete(primaryValue);
     }
