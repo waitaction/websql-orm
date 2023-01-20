@@ -34,7 +34,7 @@ export class DbContext<T extends Table>{
     /**
      * 查询表的所有记录 
      * */
-    async  fromSql(sql: string, value: Array<any>): Promise<Array<T>> {
+    async fromSql(sql: string, value: Array<any>): Promise<Array<T>> {
         let that = this;
         await this.init();
         EnvConfig.debug(`fromSql:`);
@@ -161,18 +161,25 @@ export class DbContext<T extends Table>{
         let promise = new Promise<number>(async resolve => {
             await that.init();
             if ((value instanceof Array) && value.length > 0) {
-                var rowsAffected = 0;
-                for (let index = 0; index < value.length; index++) {
-                    try {
-                        let element = value[index];
-                        var _rowsAffected = await that.insert(element);
-                        rowsAffected += _rowsAffected;
-                    } catch (error) {
-                        console.error(error);
+                var rowsAffected = value.length;
+                // 事务批量插入
+                that.db.transaction(function (t) {
+                    for (let index = 0; index < value.length; index++) {
+                        try {
+                            let element = value[index];
+                            let sqlResult = that.gSql.gInsertSql(that.__tableName, that.objClass["__columns__"], element);
+                            t.executeSql(sqlResult[0], sqlResult[1]);
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
-                }
-                EnvConfig.debug(`insert result: ${rowsAffected}`);
-                resolve(rowsAffected);
+                }, function (error) {
+                    EnvConfig.debug(`insert result: ${error}`);
+                    resolve(0);
+                }, function () {
+                    EnvConfig.debug(`insert result: ${rowsAffected}`);
+                    resolve(rowsAffected);
+                });
                 return;
             }
 
@@ -186,6 +193,7 @@ export class DbContext<T extends Table>{
                     resolve(0);
                     return true;
                 });
+
             });
 
 

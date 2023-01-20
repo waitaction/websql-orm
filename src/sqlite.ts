@@ -7,6 +7,9 @@ import { EnvConfig } from "./EnvConfig";
  * sqlite orm
  */
 export class sqlite {
+
+
+    
     /**
      * 返回查询出的数据数组
      * @param tableInstance 实体实列,例如 new student()
@@ -76,6 +79,8 @@ export class sqlite {
             return context.insert(value);
         }
     }
+
+    
     /**
      * 修改记录,返回受影响的行数
      * @param value 定义的实体实例数据，例如 var stu = new student(); stu.user_name = 'Tom' ...
